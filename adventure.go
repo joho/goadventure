@@ -1,7 +1,18 @@
 package main
 
-import "fmt"
+import (
+  "fmt"
+  "log"
+  "github.com/whee/adn"
+)
 
 func main() {
-	fmt.Println("One day, this will be the world's greatest adventure game")
+  fmt.Println("does this work?")
+
+  app := &adn.Application{}
+  post, err := app.GetPost("", "1") // unauthenticated request
+  if err != nil {
+      log.Fatal(err)
+  }
+  fmt.Printf("%s [%v]\n%s\n", post.User.Username, post.CreatedAt, post.Text)
 }
