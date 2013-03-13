@@ -1,32 +1,32 @@
 package main
 
 import (
-  "fmt"
-  "log"
-  "os"
-  "io/ioutil"
-  "strings"
-  "net/http"
-  "github.com/kurrik/oauth1a"
-  "github.com/kurrik/twittergo"
+	"fmt"
+	"github.com/kurrik/oauth1a"
+	"github.com/kurrik/twittergo"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"os"
+	"strings"
 )
 
 func main() {
-  var (
+	var (
 		err    error
 		client *twittergo.Client
 		user   *twittergo.User
-    resp   *twittergo.APIResponse
+		resp   *twittergo.APIResponse
 	)
-  fmt.Println("does this work?")
+	fmt.Println("does this work?")
 
-  client, err = LoadCredentials()
-  if err != nil {
-    log.Fatal(err)
-    os.Exit(1)
-  }
+	client, err = LoadCredentials()
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
 
-  resp = DoRequest(client, "/1.1/account/verify_credentials.json")
+	resp = DoRequest(client, "/1.1/account/verify_credentials.json")
 	user = &twittergo.User{}
 	err = resp.Parse(user)
 	if err != nil {
@@ -46,11 +46,11 @@ func main() {
 }
 
 func DoRequest(client *twittergo.Client, api_path string) (resp *twittergo.APIResponse) {
-  var (
-		req    *http.Request
-    err   error
-  )
-  req, err = http.NewRequest("GET", api_path, nil)
+	var (
+		req *http.Request
+		err error
+	)
+	req, err = http.NewRequest("GET", api_path, nil)
 	if err != nil {
 		fmt.Printf("Could not parse request: %v\n", err)
 		os.Exit(1)
@@ -60,7 +60,7 @@ func DoRequest(client *twittergo.Client, api_path string) (resp *twittergo.APIRe
 		fmt.Printf("Could not send request: %v\n", err)
 		os.Exit(1)
 	}
-  return
+	return
 }
 
 func LoadCredentials() (client *twittergo.Client, err error) {
@@ -77,4 +77,3 @@ func LoadCredentials() (client *twittergo.Client, err error) {
 	client = twittergo.NewClient(config, user)
 	return
 }
-
