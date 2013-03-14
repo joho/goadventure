@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 )
 
 func main() {
@@ -18,12 +19,15 @@ func main() {
 		resp   *twittergo.APIResponse
 	)
 
+	// set up game world
+	// set up twitter client for adventure user
 	client, err = LoadCredentials()
 	if err != nil {
 		log.Fatal(err)
 		os.Exit(1)
 	}
 
+	// print some debug on the user
 	user := &twittergo.User{}
 	resp = DoRequest(client, "/1.1/account/verify_credentials.json")
 	ParseWithErrorHandling(resp, user)
@@ -32,13 +36,36 @@ func main() {
 	fmt.Printf("Name:                 %v\n", user.Name())
 	PrintResponseRateLimits(resp)
 
-	timeline := &twittergo.Timeline{}
-	resp = DoRequest(client, "/1.1/statuses/mentions_timeline.json")
-	ParseWithErrorHandling(resp, timeline)
-	fmt.Printf("Num Mentions:   %v\n", len(*timeline))
-	for _, tweet := range *timeline {
-		fmt.Printf("Tweet:   %v\n", tweet.Text())
-	}
+	// setup channel for listen loop to tell game loop
+	// about incoming tweets
+	tweetChannel := make(chan *twittergo.Tweet)
+	var waitGroup sync.WaitGroup
+	waitGroup.Add(1)
+
+	// setup listen loop for @mentions
+	go func() {
+		// each tweet mentioned stuff onto channel
+		timeline := &twittergo.Timeline{}
+		resp = DoRequest(client, "/1.1/statuses/mentions_timeline.json")
+		ParseWithErrorHandling(resp, timeline)
+		fmt.Printf("Num Mentions:   %v\n", len(*timeline))
+		for _, tweet := range *timeline {
+			tweetChannel <- &tweet
+		}
+		waitGroup.Done()
+	}()
+
+	// setup gameplay loop
+	go func() {
+		// fetch tweet off channel
+		for tweet := range tweetChannel {
+			fmt.Printf("Tweet:   %v\n", tweet.Text())
+		}
+		// set gamestate
+		// tweet at them their "room"
+	}()
+
+	waitGroup.Wait()
 
 }
 
