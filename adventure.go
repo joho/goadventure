@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 	"sync"
 )
@@ -24,7 +23,6 @@ func main() {
 	client, err = LoadCredentials()
 	if err != nil {
 		log.Fatal(err)
-		os.Exit(1)
 	}
 
 	// print some debug on the user
@@ -76,13 +74,11 @@ func DoRequest(client *twittergo.Client, api_path string) (resp *twittergo.APIRe
 	)
 	req, err = http.NewRequest("GET", api_path, nil)
 	if err != nil {
-		fmt.Printf("Could not parse request: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("Could not parse request: %v\n", err)
 	}
 	resp, err = client.SendRequest(req)
 	if err != nil {
-		fmt.Printf("Could not send request: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("Could not send request: %v\n", err)
 	}
 	return
 }
@@ -90,8 +86,7 @@ func DoRequest(client *twittergo.Client, api_path string) (resp *twittergo.APIRe
 func ParseWithErrorHandling(resp *twittergo.APIResponse, out interface{}) {
 	err := resp.Parse(out)
 	if err != nil {
-		fmt.Printf("Problem parsing response: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("Problem parsing response: %v\n", err)
 	}
 }
 
@@ -108,7 +103,7 @@ func PrintResponseRateLimits(resp *twittergo.APIResponse) {
 func LoadCredentials() (client *twittergo.Client, err error) {
 	credentials, err := ioutil.ReadFile("CREDENTIALS")
 	if err != nil {
-		return
+		log.Fatal("CREDENTIALS file missing")
 	}
 	lines := strings.Split(string(credentials), "\n")
 	config := &oauth1a.ClientConfig{
