@@ -13,9 +13,9 @@ import (
 
 func main() {
 	var (
-		err           error
-		client        *twittergo.Client
-		resp          *twittergo.APIResponse
+		err    error
+		client *twittergo.Client
+		resp   *twittergo.APIResponse
 	)
 
 	client, err = LoadCredentials()
@@ -24,7 +24,7 @@ func main() {
 		os.Exit(1)
 	}
 
-  user := &twittergo.User{}
+	user := &twittergo.User{}
 	resp = DoRequest(client, "/1.1/account/verify_credentials.json")
 	ParseWithErrorHandling(resp, user)
 
@@ -32,12 +32,12 @@ func main() {
 	fmt.Printf("Name:                 %v\n", user.Name())
 	PrintResponseRateLimits(resp)
 
-  timeline := &twittergo.Timeline{}
+	timeline := &twittergo.Timeline{}
 	resp = DoRequest(client, "/1.1/statuses/mentions_timeline.json")
 	ParseWithErrorHandling(resp, timeline)
 	fmt.Printf("Num Mentions:   %v\n", len(*timeline))
 	for _, tweet := range *timeline {
-    fmt.Printf("Tweet:   %v\n", tweet.Text())
+		fmt.Printf("Tweet:   %v\n", tweet.Text())
 	}
 
 }
