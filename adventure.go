@@ -20,19 +20,19 @@ func Run() {
 
 	// set up game world
 	// set up twitter client for adventure user
-	client, err = LoadCredentials()
+	client, err = loadCredentials()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// print some debug on the user
 	user := &twittergo.User{}
-	resp = DoRequest(client, "/1.1/account/verify_credentials.json")
-	ParseWithErrorHandling(resp, user)
+	resp = doRequest(client, "/1.1/account/verify_credentials.json")
+	parseWithErrorHandling(resp, user)
 
 	fmt.Printf("ID:                   %v\n", user.Id())
 	fmt.Printf("Name:                 %v\n", user.Name())
-	PrintResponseRateLimits(resp)
+	printResponseRateLimits(resp)
 
 	// setup channel for listen loop to tell game loop
 	// about incoming tweets
@@ -44,8 +44,8 @@ func Run() {
 	go func() {
 		// each tweet mentioned stuff onto channel
 		timeline := &twittergo.Timeline{}
-		resp = DoRequest(client, "/1.1/statuses/mentions_timeline.json")
-		ParseWithErrorHandling(resp, timeline)
+		resp = doRequest(client, "/1.1/statuses/mentions_timeline.json")
+		parseWithErrorHandling(resp, timeline)
 		fmt.Printf("Num Mentions:   %v\n", len(*timeline))
 		for _, tweet := range *timeline {
 			tweetChannel <- &tweet
@@ -68,7 +68,7 @@ func Run() {
 
 }
 
-func DoRequest(client *twittergo.Client, api_path string) (resp *twittergo.APIResponse) {
+func doRequest(client *twittergo.Client, api_path string) (resp *twittergo.APIResponse) {
 	var (
 		req *http.Request
 		err error
@@ -84,14 +84,14 @@ func DoRequest(client *twittergo.Client, api_path string) (resp *twittergo.APIRe
 	return
 }
 
-func ParseWithErrorHandling(resp *twittergo.APIResponse, out interface{}) {
+func parseWithErrorHandling(resp *twittergo.APIResponse, out interface{}) {
 	err := resp.Parse(out)
 	if err != nil {
 		log.Fatalf("Problem parsing response: %v\n", err)
 	}
 }
 
-func PrintResponseRateLimits(resp *twittergo.APIResponse) {
+func printResponseRateLimits(resp *twittergo.APIResponse) {
 	if resp.HasRateLimit() {
 		fmt.Printf("Rate limit:           %v\n", resp.RateLimit())
 		fmt.Printf("Rate limit remaining: %v\n", resp.RateLimitRemaining())
@@ -101,7 +101,7 @@ func PrintResponseRateLimits(resp *twittergo.APIResponse) {
 	}
 }
 
-func LoadCredentials() (client *twittergo.Client, err error) {
+func loadCredentials() (client *twittergo.Client, err error) {
 	credentials, err := ioutil.ReadFile("CREDENTIALS")
 	if err != nil {
 		log.Fatal("CREDENTIALS file missing")
