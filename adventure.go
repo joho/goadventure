@@ -1,4 +1,4 @@
-package main
+package adventure
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 	"sync"
 )
 
-func main() {
+func Run() {
 	var (
 		err    error
 		client *twittergo.Client
@@ -50,6 +50,7 @@ func main() {
 		for _, tweet := range *timeline {
 			tweetChannel <- &tweet
 		}
+		close(tweetChannel)
 		waitGroup.Done()
 	}()
 
