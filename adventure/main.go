@@ -1,7 +1,7 @@
 package main
 
-import "github.com/joho/adventure"
+import "github.com/joho/goadventure"
 
 func main() {
-	adventure.Run()
+	goadventure.Run()
 }

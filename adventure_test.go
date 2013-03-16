@@ -1,4 +1,4 @@
-package adventure
+package goadventure
 
 import (
 	"testing"
