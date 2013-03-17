@@ -1,26 +1,17 @@
 package goadventure
 
 import (
-	"fmt"
 	"github.com/kurrik/twittergo"
 	"sync"
 )
 
-func Run(useLiveTwitterClient bool) {
+func Run(twitterWrapper TwitterWrapper) {
 	var (
-		twitterWrapper TwitterWrapper
-		game           *Game
+		game *Game
 	)
 
 	// set up game world
 	game = &Game{}
-
-	// set up twitter client for adventure user
-	if useLiveTwitterClient {
-		twitterWrapper = NewRealTwitterWrapper()
-	} else {
-		twitterWrapper = new(FakeTwitterWrapper)
-	}
 
 	// print some debug on the user
 	twitterWrapper.PrintUserDebugInfo()
@@ -46,7 +37,6 @@ func Run(useLiveTwitterClient bool) {
 	go func() {
 		// fetch tweet off channel
 		for tweet := range tweetChannel {
-			fmt.Printf("Tweet:   %v\n", tweet.Text())
 			// set gamestate
 			user := tweet.User()
 

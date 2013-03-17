@@ -1,7 +1,17 @@
 package main
 
-import "github.com/joho/goadventure"
+import (
+	"flag"
+	"github.com/joho/goadventure"
+)
 
 func main() {
-	goadventure.Run(false)
+	useLiveTwitterClient := flag.Bool("live-twitter", false, "set to actually talk to live twitter")
+	flag.Parse()
+
+	if *useLiveTwitterClient {
+		goadventure.Run(goadventure.NewRealTwitterWrapper())
+	} else {
+		goadventure.Run(new(goadventure.FakeTwitterWrapper))
+	}
 }
