@@ -40,6 +40,10 @@ func (twitterWrapper TwitterWrapper) GetUserMentionsTimeline() (timeline *twitte
 	return
 }
 
+func (twitterWrapper TwitterWrapper) SendResponseToUser(user *twittergo.User, message string) {
+	fmt.Printf("Hypothetically sending '%v' to '%v'", message, user.ScreenName())
+}
+
 func (twitterWrapper TwitterWrapper) doRequest(api_path string) (resp *twittergo.APIResponse) {
 	var (
 		req *http.Request

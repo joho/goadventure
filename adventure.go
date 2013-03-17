@@ -9,9 +9,12 @@ import (
 func Run() {
 	var (
 		twitterWrapper *TwitterWrapper
+		game           *Game
 	)
 
 	// set up game world
+	game = &Game{}
+
 	// set up twitter client for adventure user
 	twitterWrapper = NewTwitterWrapper()
 
@@ -40,9 +43,15 @@ func Run() {
 		// fetch tweet off channel
 		for tweet := range tweetChannel {
 			fmt.Printf("Tweet:   %v\n", tweet.Text())
+			// set gamestate
+			user := tweet.User()
+
+			gameState := game.GetStateForUser(user.ScreenName())
+			response := gameState.UpdateState(tweet.Text())
+
+			// tweet at them their "room"
+			twitterWrapper.SendResponseToUser(&user, response)
 		}
-		// set gamestate
-		// tweet at them their "room"
 	}()
 
 	waitGroup.Wait()
