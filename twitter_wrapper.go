@@ -20,7 +20,7 @@ func NewTwitterWrapper() *TwitterWrapper {
 	return &twitterWrapper
 }
 
-func (twitterWrapper TwitterWrapper) PrintUserDebugInfo() {
+func (twitterWrapper *TwitterWrapper) PrintUserDebugInfo() {
 	var resp *twittergo.APIResponse
 	user := &twittergo.User{}
 	resp = twitterWrapper.doRequest("/1.1/account/verify_credentials.json")
@@ -31,7 +31,7 @@ func (twitterWrapper TwitterWrapper) PrintUserDebugInfo() {
 	printResponseRateLimits(resp)
 }
 
-func (twitterWrapper TwitterWrapper) GetUserMentionsTimeline() (timeline *twittergo.Timeline) {
+func (twitterWrapper *TwitterWrapper) GetUserMentionsTimeline() (timeline *twittergo.Timeline) {
 	var resp *twittergo.APIResponse
 	timeline = &twittergo.Timeline{}
 	resp = twitterWrapper.doRequest("/1.1/statuses/mentions_timeline.json")
@@ -40,11 +40,11 @@ func (twitterWrapper TwitterWrapper) GetUserMentionsTimeline() (timeline *twitte
 	return
 }
 
-func (twitterWrapper TwitterWrapper) SendResponseToUser(user *twittergo.User, message string) {
+func (twitterWrapper *TwitterWrapper) SendResponseToUser(user *twittergo.User, message string) {
 	fmt.Printf("Hypothetically sending '%v' to '%v'", message, user.ScreenName())
 }
 
-func (twitterWrapper TwitterWrapper) doRequest(api_path string) (resp *twittergo.APIResponse) {
+func (twitterWrapper *TwitterWrapper) doRequest(api_path string) (resp *twittergo.APIResponse) {
 	var (
 		req *http.Request
 		err error
