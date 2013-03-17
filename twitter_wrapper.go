@@ -10,17 +10,23 @@ import (
 	"strings"
 )
 
-type TwitterWrapper struct {
+type TwitterWrapper interface {
+	PrintUserDebugInfo()
+	GetUserMentionsTimeline() *twittergo.Timeline
+	SendResponseToUser(*twittergo.User, string)
+}
+
+type RealTwitterWrapper struct {
 	client *twittergo.Client
 }
 
-func NewTwitterWrapper() *TwitterWrapper {
+func NewRealTwitterWrapper() *RealTwitterWrapper {
 	client := loadCredentials()
-	twitterWrapper := TwitterWrapper{client}
+	twitterWrapper := RealTwitterWrapper{client}
 	return &twitterWrapper
 }
 
-func (twitterWrapper *TwitterWrapper) PrintUserDebugInfo() {
+func (twitterWrapper *RealTwitterWrapper) PrintUserDebugInfo() {
 	var resp *twittergo.APIResponse
 	user := &twittergo.User{}
 	resp = twitterWrapper.doRequest("/1.1/account/verify_credentials.json")
@@ -31,7 +37,7 @@ func (twitterWrapper *TwitterWrapper) PrintUserDebugInfo() {
 	printResponseRateLimits(resp)
 }
 
-func (twitterWrapper *TwitterWrapper) GetUserMentionsTimeline() (timeline *twittergo.Timeline) {
+func (twitterWrapper *RealTwitterWrapper) GetUserMentionsTimeline() (timeline *twittergo.Timeline) {
 	var resp *twittergo.APIResponse
 	timeline = &twittergo.Timeline{}
 	resp = twitterWrapper.doRequest("/1.1/statuses/mentions_timeline.json")
@@ -40,11 +46,11 @@ func (twitterWrapper *TwitterWrapper) GetUserMentionsTimeline() (timeline *twitt
 	return
 }
 
-func (twitterWrapper *TwitterWrapper) SendResponseToUser(user *twittergo.User, message string) {
+func (twitterWrapper *RealTwitterWrapper) SendResponseToUser(user *twittergo.User, message string) {
 	fmt.Printf("Hypothetically sending '%v' to '%v'", message, user.ScreenName())
 }
 
-func (twitterWrapper *TwitterWrapper) doRequest(api_path string) (resp *twittergo.APIResponse) {
+func (twitterWrapper *RealTwitterWrapper) doRequest(api_path string) (resp *twittergo.APIResponse) {
 	var (
 		req *http.Request
 		err error
@@ -89,4 +95,25 @@ func loadCredentials() *twittergo.Client {
 	}
 	user := oauth1a.NewAuthorizedConfig(lines[2], lines[3])
 	return twittergo.NewClient(config, user)
+}
+
+type FakeTwitterWrapper struct{}
+
+func (twitterWrapper *FakeTwitterWrapper) PrintUserDebugInfo() {
+	fmt.Println("I have no actual user, I am pretend")
+}
+
+func (twitterWrapper *FakeTwitterWrapper) GetUserMentionsTimeline() *twittergo.Timeline {
+	user := map[string]interface{}{
+		"screen_name": "johnbarton",
+	}
+	tweet := twittergo.Tweet{
+		"text": "@gotextadventure go north",
+		"user": user,
+	}
+	return &twittergo.Timeline{tweet}
+}
+
+func (twitterWrapper *FakeTwitterWrapper) SendResponseToUser(user *twittergo.User, message string) {
+	fmt.Printf("Hypothetically Send tweet '%v' to '%v'", message, user.ScreenName())
 }

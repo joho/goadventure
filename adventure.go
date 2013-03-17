@@ -6,9 +6,9 @@ import (
 	"sync"
 )
 
-func Run() {
+func Run(useLiveTwitterClient bool) {
 	var (
-		twitterWrapper *TwitterWrapper
+		twitterWrapper TwitterWrapper
 		game           *Game
 	)
 
@@ -16,7 +16,11 @@ func Run() {
 	game = &Game{}
 
 	// set up twitter client for adventure user
-	twitterWrapper = NewTwitterWrapper()
+	if useLiveTwitterClient {
+		twitterWrapper = NewRealTwitterWrapper()
+	} else {
+		twitterWrapper = new(FakeTwitterWrapper)
+	}
 
 	// print some debug on the user
 	twitterWrapper.PrintUserDebugInfo()
