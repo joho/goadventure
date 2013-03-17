@@ -2,32 +2,25 @@ package goadventure
 
 import (
 	"fmt"
-	"github.com/kurrik/oauth1a"
 	"github.com/kurrik/twittergo"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"strings"
 	"sync"
 )
 
 func Run() {
 	var (
-		err    error
-		client *twittergo.Client
-		resp   *twittergo.APIResponse
+		twitterWrapper *TwitterWrapper
+		resp           *twittergo.APIResponse
 	)
 
 	// set up game world
 	// set up twitter client for adventure user
-	client, err = loadCredentials()
-	if err != nil {
-		log.Fatal(err)
-	}
+	twitterWrapper = NewTwitterWrapper()
 
 	// print some debug on the user
 	user := &twittergo.User{}
-	resp = doRequest(client, "/1.1/account/verify_credentials.json")
+	resp = doRequest(twitterWrapper.client, "/1.1/account/verify_credentials.json")
 	parseWithErrorHandling(resp, user)
 
 	fmt.Printf("ID:                   %v\n", user.Id())
@@ -44,7 +37,7 @@ func Run() {
 	go func() {
 		// each tweet mentioned stuff onto channel
 		timeline := &twittergo.Timeline{}
-		resp = doRequest(client, "/1.1/statuses/mentions_timeline.json")
+		resp = doRequest(twitterWrapper.client, "/1.1/statuses/mentions_timeline.json")
 		parseWithErrorHandling(resp, timeline)
 		fmt.Printf("Num Mentions:   %v\n", len(*timeline))
 		for _, tweet := range *timeline {
@@ -99,19 +92,4 @@ func printResponseRateLimits(resp *twittergo.APIResponse) {
 	} else {
 		fmt.Printf("Could not parse rate limit from response.\n")
 	}
-}
-
-func loadCredentials() (client *twittergo.Client, err error) {
-	credentials, err := ioutil.ReadFile("CREDENTIALS")
-	if err != nil {
-		log.Fatal("CREDENTIALS file missing")
-	}
-	lines := strings.Split(string(credentials), "\n")
-	config := &oauth1a.ClientConfig{
-		ConsumerKey:    lines[0],
-		ConsumerSecret: lines[1],
-	}
-	user := oauth1a.NewAuthorizedConfig(lines[2], lines[3])
-	client = twittergo.NewClient(config, user)
-	return
 }
