@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
@@ -47,7 +48,40 @@ func (twitterWrapper *RealTwitterWrapper) GetUserMentionsTimeline() (timeline *t
 }
 
 func (twitterWrapper *RealTwitterWrapper) RespondToTweet(tweet *twittergo.Tweet, message string) {
-	fmt.Printf("Hypothetically sending '%v' to '%v'", message, tweet.User().ScreenName())
+	var (
+		err  error
+		user twittergo.User
+		req  *http.Request
+		resp *twittergo.APIResponse
+	)
+
+	user = tweet.User()
+	data := url.Values{}
+
+	// set status
+	status := fmt.Sprintf("@%v %v", user.ScreenName(), message)
+	data.Set("status", status)
+	// set in_reply_to_status_id
+	status_id := fmt.Sprintf("%d", tweet.Id())
+	data.Set("in_reply_to_status_id", status_id)
+
+	log.Printf("Set status '%v' to '%v' in reply to %v", status, user.ScreenName(), status_id)
+
+	body := strings.NewReader(data.Encode())
+	req, err = http.NewRequest("POST", "/1.1/statuses/update.json", body)
+	if err != nil {
+		log.Fatalf("Could not parse request: %v\n", err)
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	resp, err = twitterWrapper.client.SendRequest(req)
+	if err != nil {
+		log.Fatalf("Could not send request: %v\n", err)
+	}
+	tweet = &twittergo.Tweet{}
+	err = resp.Parse(tweet)
+	if err != nil {
+		log.Fatalf("Problem parsing response: %v\n", err)
+	}
 }
 
 func (twitterWrapper *RealTwitterWrapper) doGetRequest(api_path string) (resp *twittergo.APIResponse) {
