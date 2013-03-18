@@ -16,6 +16,7 @@ func (twitterWrapper *TestHarnessTwitterWrapper) PrintUserDebugInfo() {
 func (twitterWrapper *TestHarnessTwitterWrapper) GetUserMentionsTimeline() *twittergo.Timeline {
 	user := map[string]interface{}{
 		"screen_name": "johnbarton",
+		"id_str":      "123549854887",
 	}
 	tweet := twittergo.Tweet{
 		"text": "@gotextadventure go north",

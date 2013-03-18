@@ -40,11 +40,10 @@ func Run(twitterWrapper TwitterWrapper) {
 			// set gamestate
 			user := tweet.User()
 
-			gameState := game.GetStateForUser(user.ScreenName())
-			response := gameState.UpdateState(tweet.Text())
+			message := game.Play(user.Id(), tweet.Text())
 
 			// tweet at them their "room"
-			twitterWrapper.SendResponseToUser(&user, response)
+			twitterWrapper.SendResponseToUser(&user, message)
 		}
 	}()
 
