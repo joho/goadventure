@@ -29,7 +29,7 @@ func NewRealTwitterWrapper() *RealTwitterWrapper {
 func (twitterWrapper *RealTwitterWrapper) PrintUserDebugInfo() {
 	var resp *twittergo.APIResponse
 	user := &twittergo.User{}
-	resp = twitterWrapper.doRequest("/1.1/account/verify_credentials.json")
+	resp = twitterWrapper.doGetRequest("/1.1/account/verify_credentials.json")
 	parseWithErrorHandling(resp, user)
 
 	fmt.Printf("ID:                   %v\n", user.Id())
@@ -40,7 +40,7 @@ func (twitterWrapper *RealTwitterWrapper) PrintUserDebugInfo() {
 func (twitterWrapper *RealTwitterWrapper) GetUserMentionsTimeline() (timeline *twittergo.Timeline) {
 	var resp *twittergo.APIResponse
 	timeline = &twittergo.Timeline{}
-	resp = twitterWrapper.doRequest("/1.1/statuses/mentions_timeline.json")
+	resp = twitterWrapper.doGetRequest("/1.1/statuses/mentions_timeline.json")
 	parseWithErrorHandling(resp, timeline)
 	fmt.Printf("Num Mentions:   %v\n", len(*timeline))
 	return
@@ -50,7 +50,7 @@ func (twitterWrapper *RealTwitterWrapper) RespondToTweet(tweet *twittergo.Tweet,
 	fmt.Printf("Hypothetically sending '%v' to '%v'", message, tweet.User().ScreenName())
 }
 
-func (twitterWrapper *RealTwitterWrapper) doRequest(api_path string) (resp *twittergo.APIResponse) {
+func (twitterWrapper *RealTwitterWrapper) doGetRequest(api_path string) (resp *twittergo.APIResponse) {
 	var (
 		req *http.Request
 		err error
