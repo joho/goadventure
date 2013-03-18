@@ -13,7 +13,7 @@ import (
 type TwitterWrapper interface {
 	PrintUserDebugInfo()
 	GetUserMentionsTimeline() *twittergo.Timeline
-	SendResponseToUser(*twittergo.User, string)
+	RespondToTweet(*twittergo.Tweet, string)
 }
 
 type RealTwitterWrapper struct {
@@ -46,8 +46,8 @@ func (twitterWrapper *RealTwitterWrapper) GetUserMentionsTimeline() (timeline *t
 	return
 }
 
-func (twitterWrapper *RealTwitterWrapper) SendResponseToUser(user *twittergo.User, message string) {
-	fmt.Printf("Hypothetically sending '%v' to '%v'", message, user.ScreenName())
+func (twitterWrapper *RealTwitterWrapper) RespondToTweet(tweet *twittergo.Tweet, message string) {
+	fmt.Printf("Hypothetically sending '%v' to '%v'", message, tweet.User().ScreenName())
 }
 
 func (twitterWrapper *RealTwitterWrapper) doRequest(api_path string) (resp *twittergo.APIResponse) {
@@ -115,6 +115,6 @@ func (twitterWrapper *FakeTwitterWrapper) GetUserMentionsTimeline() *twittergo.T
 	return &twittergo.Timeline{tweet}
 }
 
-func (twitterWrapper *FakeTwitterWrapper) SendResponseToUser(user *twittergo.User, message string) {
-	fmt.Printf("Hypothetically Send tweet '%v' to '%v'", message, user.ScreenName())
+func (twitterWrapper *FakeTwitterWrapper) RespondToTweet(tweet *twittergo.Tweet, message string) {
+	fmt.Printf("Hypothetically Send tweet '%v' to '%v'", message, tweet.User().ScreenName())
 }

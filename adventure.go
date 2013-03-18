@@ -43,7 +43,7 @@ func Run(twitterWrapper TwitterWrapper) {
 			message := game.Play(user.Id(), tweet.Text())
 
 			// tweet at them their "room"
-			twitterWrapper.SendResponseToUser(&user, message)
+			twitterWrapper.RespondToTweet(tweet, message)
 		}
 	}()
 

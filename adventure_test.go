@@ -25,7 +25,7 @@ func (twitterWrapper *TestHarnessTwitterWrapper) GetUserMentionsTimeline() *twit
 	return &twittergo.Timeline{tweet}
 }
 
-func (twitterWrapper *TestHarnessTwitterWrapper) SendResponseToUser(user *twittergo.User, message string) {
+func (twitterWrapper *TestHarnessTwitterWrapper) RespondToTweet(tweet *twittergo.Tweet, message string) {
 	twitterWrapper.sentMessages = append(twitterWrapper.sentMessages, message)
 }
 
