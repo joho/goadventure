@@ -30,7 +30,6 @@ func Run(twitterWrapper TwitterWrapper) {
 			tweetChannel <- &tweet
 		}
 		close(tweetChannel)
-		waitGroup.Done()
 	}()
 
 	// setup gameplay loop
@@ -45,6 +44,7 @@ func Run(twitterWrapper TwitterWrapper) {
 			// tweet at them their "room"
 			twitterWrapper.RespondToTweet(tweet, message)
 		}
+		waitGroup.Done()
 	}()
 
 	waitGroup.Wait()
