@@ -124,25 +124,3 @@ func loadCredentials() *twittergo.Client {
 	user := oauth1a.NewAuthorizedConfig(lines[2], lines[3])
 	return twittergo.NewClient(config, user)
 }
-
-type FakeTwitterWrapper struct{}
-
-func (twitterWrapper *FakeTwitterWrapper) PrintUserDebugInfo() {
-	fmt.Println("I have no actual user, I am pretend")
-}
-
-func (twitterWrapper *FakeTwitterWrapper) GetUserMentionsTimeline() *twittergo.Timeline {
-	user := map[string]interface{}{
-		"screen_name": "johnbarton",
-		"id_str":      "123549854887",
-	}
-	tweet := twittergo.Tweet{
-		"text": "@gotextadventure go north",
-		"user": user,
-	}
-	return &twittergo.Timeline{tweet}
-}
-
-func (twitterWrapper *FakeTwitterWrapper) RespondToTweet(tweet *twittergo.Tweet, message string) {
-	fmt.Printf("Hypothetically Send tweet '%v' to '%v'", message, tweet.User().ScreenName())
-}
