@@ -11,12 +11,6 @@ import (
 	"strings"
 )
 
-type TwitterWrapper interface {
-	PrintUserDebugInfo()
-	GetUserMentionsTimeline() *twittergo.Timeline
-	RespondToTweet(*twittergo.Tweet, string)
-}
-
 type RealTwitterWrapper struct {
 	client *twittergo.Client
 }
