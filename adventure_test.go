@@ -6,6 +6,7 @@ import (
 )
 
 type TestHarnessTwitterWrapper struct {
+	timeToFinish chan bool
 	sentMessages []string
 }
 
@@ -27,11 +28,15 @@ func (twitterWrapper *TestHarnessTwitterWrapper) GetUserMentionsTimeline() *twit
 
 func (twitterWrapper *TestHarnessTwitterWrapper) RespondToTweet(tweet *twittergo.Tweet, message string) {
 	twitterWrapper.sentMessages = append(twitterWrapper.sentMessages, message)
+	twitterWrapper.timeToFinish <- true
 }
 
 func TestRun(t *testing.T) {
 	twitterWrapper := new(TestHarnessTwitterWrapper)
-	Run(twitterWrapper)
+	twitterWrapper.timeToFinish = make(chan bool)
+
+	Run(twitterWrapper.timeToFinish, twitterWrapper)
+
 	if len(twitterWrapper.sentMessages) != 1 {
 		t.Fatalf("Expected 1 sent twitter message got %v", len(twitterWrapper.sentMessages))
 	}
