@@ -24,5 +24,5 @@ func (twitterWrapper *FakeTwitterWrapper) GetUserMentionsTimeline() *twittergo.T
 }
 
 func (twitterWrapper *FakeTwitterWrapper) RespondToTweet(tweet *twittergo.Tweet, message string) {
-	fmt.Printf("Hypothetically Send tweet '%v' to '%v'", message, tweet.User().ScreenName())
+	fmt.Printf("Hypothetically Send tweet '%v' to '%v'\n", message, tweet.User().ScreenName())
 }
