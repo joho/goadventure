@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-var minDurationBetweenReads = 3 * time.Second
+var minDurationBetweenReads = 1 * time.Minute
 
 func Run(stopRunning chan bool, twitterWrapper TwitterWrapper) {
 	var (
