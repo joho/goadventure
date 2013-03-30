@@ -27,6 +27,8 @@ func Run(stopRunning chan bool, twitterWrapper TwitterWrapper) {
 
 	// setup listen loop for @mentions
 	go func() {
+		var timelineLastReadAt time.Time
+
 	ListenLoop:
 		for {
 			select {
@@ -34,12 +36,14 @@ func Run(stopRunning chan bool, twitterWrapper TwitterWrapper) {
 				close(tweetChannel)
 				break ListenLoop
 			default:
-				timeline := twitterWrapper.GetUserMentionsTimeline()
-				// each tweet mentioned stuff onto channel
-				for _, tweet := range *timeline {
-					tweetChannel <- &tweet
+				if time.Since(timelineLastReadAt) > minDurationBetweenReads {
+					timeline := twitterWrapper.GetUserMentionsTimeline()
+					timelineLastReadAt = time.Now()
+					// each tweet mentioned stuff onto channel
+					for _, tweet := range *timeline {
+						tweetChannel <- &tweet
+					}
 				}
-				time.Sleep(minDurationBetweenReads)
 			}
 		}
 	}()
