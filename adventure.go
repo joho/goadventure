@@ -3,9 +3,12 @@ package goadventure
 import (
 	"github.com/kurrik/twittergo"
 	"sync"
+	"time"
 )
 
-func Run(twitterWrapper TwitterWrapper) {
+var minDurationBetweenReads = 3 * time.Second
+
+func Run(stopRunning chan bool, twitterWrapper TwitterWrapper) {
 	var (
 		game *Game
 	)
@@ -24,12 +27,21 @@ func Run(twitterWrapper TwitterWrapper) {
 
 	// setup listen loop for @mentions
 	go func() {
-		timeline := twitterWrapper.GetUserMentionsTimeline()
-		// each tweet mentioned stuff onto channel
-		for _, tweet := range *timeline {
-			tweetChannel <- &tweet
+	ListenLoop:
+		for {
+			select {
+			case <-stopRunning:
+				close(tweetChannel)
+				break ListenLoop
+			default:
+				timeline := twitterWrapper.GetUserMentionsTimeline()
+				// each tweet mentioned stuff onto channel
+				for _, tweet := range *timeline {
+					tweetChannel <- &tweet
+				}
+				time.Sleep(minDurationBetweenReads)
+			}
 		}
-		close(tweetChannel)
 	}()
 
 	// setup gameplay loop
