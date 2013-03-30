@@ -37,8 +37,9 @@ func Run(stopRunning chan bool, twitterWrapper TwitterWrapper) {
 				break ListenLoop
 			default:
 				if time.Since(timelineLastReadAt) > minDurationBetweenReads {
-					timeline := twitterWrapper.GetUserMentionsTimeline()
 					timelineLastReadAt = time.Now()
+
+					timeline := twitterWrapper.GetUserMentionsTimeline()
 					// each tweet mentioned stuff onto channel
 					for _, tweet := range *timeline {
 						tweetChannel <- &tweet
