@@ -11,3 +11,16 @@ Right now it's a git log of embarrassment as I learn a new programming language.
 ## Licence
 
 I haven't decided yet, for right now consider it plain old copyright.
+
+## Code review notes
+
+  * tomb package for proper stopping on control channels
+  * using this/self is kinda discouraged (rob pike, single chars, fuck that)
+  * go fmt -r (renames stuff by magic)
+  * start developing against 1.1 (compatible and faster)
+    - do not set go root
+    - build from source (or homebrew)
+    - use abs path
+  * check out "go check" or https://github.com/remogatto/prettytest
+  * if you're writing a library do executable examples
+  * read https://gobyexample.com/
