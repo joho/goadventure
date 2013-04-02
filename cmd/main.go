@@ -6,17 +6,20 @@ import (
 	"github.com/joho/goadventure"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 )
 
 func main() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
+
 	useLiveTwitterClient := flag.Bool("live-twitter", false, "set to actually talk to live twitter")
 	flag.Parse()
 
 	fmt.Println("Server starting up. CTRL+C to quit (may take a few seconds)")
-	stopRunning := make(chan bool, 1)
+	stopRunning := make(chan bool)
 	go func() {
-		signalChannel := make(chan os.Signal, 1)
+		signalChannel := make(chan os.Signal)
 		signal.Notify(signalChannel, syscall.SIGINT)
 
 		<-signalChannel
