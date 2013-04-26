@@ -28,7 +28,8 @@ type Command struct {
 
 func CreateGame() *Game {
 	roomOne := &Scene{"Welcome to room one. You can go north.", nil}
-	roomTwo := &Scene{"You're in room two. You can go south", nil}
+	roomTwo := &Scene{"You're in room two. You can go south or west", nil}
+	roomThree := &Scene{"You're in room three. You can go east", nil}
 
 	choiceRoomOneToTwo := &Choice{
 		Command{"go", "north"},
@@ -41,11 +42,22 @@ func CreateGame() *Game {
 		roomOne,
 	}
 	roomTwo.choices = append(roomTwo.choices, choiceRoomTwoToOne)
+	choiceRoomTwoToThree := &Choice{
+		Command{"go", "west"},
+		roomThree,
+	}
+	roomTwo.choices = append(roomTwo.choices, choiceRoomTwoToThree)
+
+	choiceRoomThreeToTwo := &Choice{
+		Command{"go", "east"},
+		roomTwo,
+	}
+	roomThree.choices = append(roomThree.choices, choiceRoomThreeToTwo)
 
 	emptySceneMap := map[uint64]*Scene{}
 	return &Game{
 		StateRepo{emptySceneMap},
-		roomTwo,
+		roomOne,
 	}
 }
 
