@@ -16,9 +16,6 @@ func Run(stopRunning chan bool, twitterWrapper TwitterWrapper) {
 	// set up game world
 	game = &Game{}
 
-	// print some debug on the user
-	twitterWrapper.PrintUserDebugInfo()
-
 	// setup channel for listen loop to tell game loop
 	// about incoming tweets
 	tweetChannel := make(chan *twittergo.Tweet)

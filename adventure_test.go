@@ -10,10 +10,6 @@ type TestHarnessTwitterWrapper struct {
 	sentMessages []string
 }
 
-func (twitterWrapper *TestHarnessTwitterWrapper) PrintUserDebugInfo() {
-	// no op
-}
-
 func (twitterWrapper *TestHarnessTwitterWrapper) GetUserMentionsTimeline() *twittergo.Timeline {
 	user := map[string]interface{}{
 		"screen_name": "johnbarton",

@@ -7,10 +7,6 @@ import (
 
 type FakeTwitterWrapper struct{}
 
-func (twitterWrapper *FakeTwitterWrapper) PrintUserDebugInfo() {
-	fmt.Println("I have no actual user, I am pretend")
-}
-
 func (twitterWrapper *FakeTwitterWrapper) GetUserMentionsTimeline() *twittergo.Timeline {
 	user := map[string]interface{}{
 		"screen_name": "johnbarton",

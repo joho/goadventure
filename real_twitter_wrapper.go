@@ -18,10 +18,11 @@ type RealTwitterWrapper struct {
 func NewRealTwitterWrapper() *RealTwitterWrapper {
 	client := loadCredentials()
 	twitterWrapper := RealTwitterWrapper{client}
+	twitterWrapper.printUserDebugInfo()
 	return &twitterWrapper
 }
 
-func (twitterWrapper *RealTwitterWrapper) PrintUserDebugInfo() {
+func (twitterWrapper *RealTwitterWrapper) printUserDebugInfo() {
 	var resp *twittergo.APIResponse
 	user := &twittergo.User{}
 	resp = twitterWrapper.doGetRequest("/1.1/account/verify_credentials.json")
