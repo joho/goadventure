@@ -22,8 +22,9 @@ func (tw *TestHarnessTwitterWrapper) GetUserMentionsTimeline() *twittergo.Timeli
 		"id_str":      "123549854887",
 	}
 	tweet := twittergo.Tweet{
-		"text": "@gotextadventure go north",
-		"user": user,
+		"text":   "@gotextadventure go north",
+		"user":   user,
+		"id_str": "123543654887",
 	}
 	return &twittergo.Timeline{tweet}
 }
