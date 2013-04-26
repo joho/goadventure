@@ -17,6 +17,7 @@ I haven't decided yet, for right now consider it plain old copyright.
   - [x] main game loop with input and output goroutines
   - [x] read & write from twitter API
   - [x] have "interactive" mode to mock twitter for dev
+  - [ ] investigate [github.com/peterbourgon/diskv](https://github.com/peterbourgon/diskv) for persistance
   - [ ] persistently store tweet reply status (for avoiding spam)
   - [ ] persistently store game state
   - [x] data structures for game -> scenes -> choices
