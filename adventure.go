@@ -12,7 +12,7 @@ func Run(stopRunning chan bool, twitterWrapper TwitterWrapper) {
 	)
 
 	// set up game world
-	game = &Game{}
+	game = CreateGame()
 
 	// setup channel for listen loop to tell game loop
 	// about incoming tweets
