@@ -4,6 +4,7 @@ import "strings"
 
 type Game struct {
 	StateRepo
+	openingScene *Scene
 }
 
 type StateRepo struct {
@@ -12,6 +13,12 @@ type StateRepo struct {
 
 type Scene struct {
 	Description string
+	choices     []*Choice
+}
+
+type Choice struct {
+	command Command
+	scene   *Scene
 }
 
 type Command struct {
@@ -20,10 +27,25 @@ type Command struct {
 }
 
 func CreateGame() *Game {
+	roomOne := &Scene{"Welcome to room one. You can go north.", nil}
+	roomTwo := &Scene{"You're in room two. You can go south", nil}
+
+	choiceRoomOneToTwo := &Choice{
+		Command{"go", "north"},
+		roomTwo,
+	}
+	roomOne.choices = append(roomOne.choices, choiceRoomOneToTwo)
+
+	choiceRoomTwoToOne := &Choice{
+		Command{"go", "south"},
+		roomOne,
+	}
+	roomTwo.choices = append(roomTwo.choices, choiceRoomTwoToOne)
+
+	emptySceneMap := map[uint64]*Scene{}
 	return &Game{
-		StateRepo{
-			map[uint64]*Scene{},
-		},
+		StateRepo{emptySceneMap},
+		roomTwo,
 	}
 }
 
@@ -54,7 +76,7 @@ func (game *Game) Play(twitterUserId uint64, rawCommand string) string {
 }
 
 func (game *Game) OpeningScene() *Scene {
-	return &Scene{"Welcome. You are in an empty room. There is a door to the north."}
+	return game.openingScene
 }
 
 func (repo *StateRepo) CurrentSceneForUser(twitterUserId uint64) *Scene {
@@ -66,11 +88,10 @@ func (repo *StateRepo) SetCurrentSceneForUser(twitterUserId uint64, scene *Scene
 }
 
 func (scene *Scene) DoSomethingMagical(command Command) (nextScene *Scene) {
-	if command.Verb == "go" {
-		if command.Subject == "north" && strings.Contains(scene.Description, "north") {
-			nextScene = &Scene{"You're in an empty room. There is a door to the south."}
-		} else if command.Subject == "south" && strings.Contains(scene.Description, "south") {
-			nextScene = &Scene{"You're in an empty room. There is a door to the north."}
+	for _, choice := range scene.choices {
+		if choice.command == command {
+			nextScene = choice.scene
+			break
 		}
 	}
 	return
