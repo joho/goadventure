@@ -48,10 +48,8 @@ func Run(stopRunning chan bool, twitterWrapper TwitterWrapper) {
 	go func() {
 		// fetch tweet off channel
 		for tweet := range tweetChannel {
-			// set gamestate
-			user := tweet.User()
-
-			message := game.Play(user.Id(), tweet.Text())
+			// play the game
+			message := game.Play(tweet.User().Id(), tweet.Text())
 
 			// tweet at them their "room"
 			twitterWrapper.RespondToTweet(tweet, message)
