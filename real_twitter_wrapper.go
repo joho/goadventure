@@ -18,20 +18,20 @@ type RealTwitterWrapper struct {
 
 func NewRealTwitterWrapper() *RealTwitterWrapper {
 	client := loadCredentials()
-	twitterWrapper := RealTwitterWrapper{client}
-	twitterWrapper.printUserDebugInfo()
-	return &twitterWrapper
+	tw := RealTwitterWrapper{client}
+	tw.printUserDebugInfo()
+	return &tw
 }
 
-func (twitterWrapper *RealTwitterWrapper) DurationUntilNextRead() time.Duration {
+func (tw *RealTwitterWrapper) DurationUntilNextRead() time.Duration {
 	// TODO make this dynamically look at rate limit stuff
 	return 1 * time.Minute
 }
 
-func (twitterWrapper *RealTwitterWrapper) printUserDebugInfo() {
+func (tw *RealTwitterWrapper) printUserDebugInfo() {
 	var resp *twittergo.APIResponse
 	user := &twittergo.User{}
-	resp = twitterWrapper.doGetRequest("/1.1/account/verify_credentials.json")
+	resp = tw.doGetRequest("/1.1/account/verify_credentials.json")
 	parseWithErrorHandling(resp, user)
 
 	fmt.Printf("ID:                   %v\n", user.Id())
@@ -39,16 +39,16 @@ func (twitterWrapper *RealTwitterWrapper) printUserDebugInfo() {
 	printResponseRateLimits(resp)
 }
 
-func (twitterWrapper *RealTwitterWrapper) GetUserMentionsTimeline() (timeline *twittergo.Timeline) {
+func (tw *RealTwitterWrapper) GetUserMentionsTimeline() (timeline *twittergo.Timeline) {
 	var resp *twittergo.APIResponse
 	timeline = &twittergo.Timeline{}
-	resp = twitterWrapper.doGetRequest("/1.1/statuses/mentions_timeline.json")
+	resp = tw.doGetRequest("/1.1/statuses/mentions_timeline.json")
 	parseWithErrorHandling(resp, timeline)
 	fmt.Printf("Num Mentions:   %v\n", len(*timeline))
 	return
 }
 
-func (twitterWrapper *RealTwitterWrapper) RespondToTweet(tweet *twittergo.Tweet, message string) {
+func (tw *RealTwitterWrapper) RespondToTweet(tweet *twittergo.Tweet, message string) {
 	var (
 		err  error
 		user twittergo.User
@@ -74,7 +74,7 @@ func (twitterWrapper *RealTwitterWrapper) RespondToTweet(tweet *twittergo.Tweet,
 		log.Fatalf("Could not parse request: %v\n", err)
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	resp, err = twitterWrapper.client.SendRequest(req)
+	resp, err = tw.client.SendRequest(req)
 	if err != nil {
 		log.Fatalf("Could not send request: %v\n", err)
 	}
@@ -85,7 +85,7 @@ func (twitterWrapper *RealTwitterWrapper) RespondToTweet(tweet *twittergo.Tweet,
 	}
 }
 
-func (twitterWrapper *RealTwitterWrapper) doGetRequest(api_path string) (resp *twittergo.APIResponse) {
+func (tw *RealTwitterWrapper) doGetRequest(api_path string) (resp *twittergo.APIResponse) {
 	var (
 		req *http.Request
 		err error
@@ -94,7 +94,7 @@ func (twitterWrapper *RealTwitterWrapper) doGetRequest(api_path string) (resp *t
 	if err != nil {
 		log.Fatalf("Could not parse request: %v\n", err)
 	}
-	resp, err = twitterWrapper.client.SendRequest(req)
+	resp, err = tw.client.SendRequest(req)
 	if err != nil {
 		log.Fatalf("Could not send request: %v\n", err)
 	}

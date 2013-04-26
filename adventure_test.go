@@ -11,12 +11,12 @@ type TestHarnessTwitterWrapper struct {
 	sentMessages []string
 }
 
-func (twitterWrapper *TestHarnessTwitterWrapper) DurationUntilNextRead() time.Duration {
+func (tw *TestHarnessTwitterWrapper) DurationUntilNextRead() time.Duration {
 	// TODO make this dynamically look at rate limit stuff
 	return 1 * time.Millisecond
 }
 
-func (twitterWrapper *TestHarnessTwitterWrapper) GetUserMentionsTimeline() *twittergo.Timeline {
+func (tw *TestHarnessTwitterWrapper) GetUserMentionsTimeline() *twittergo.Timeline {
 	user := map[string]interface{}{
 		"screen_name": "johnbarton",
 		"id_str":      "123549854887",
@@ -28,18 +28,18 @@ func (twitterWrapper *TestHarnessTwitterWrapper) GetUserMentionsTimeline() *twit
 	return &twittergo.Timeline{tweet}
 }
 
-func (twitterWrapper *TestHarnessTwitterWrapper) RespondToTweet(tweet *twittergo.Tweet, message string) {
-	twitterWrapper.sentMessages = append(twitterWrapper.sentMessages, message)
-	twitterWrapper.timeToFinish <- true
+func (tw *TestHarnessTwitterWrapper) RespondToTweet(tweet *twittergo.Tweet, message string) {
+	tw.sentMessages = append(tw.sentMessages, message)
+	tw.timeToFinish <- true
 }
 
 func TestRun(t *testing.T) {
-	twitterWrapper := new(TestHarnessTwitterWrapper)
-	twitterWrapper.timeToFinish = make(chan bool)
+	tw := new(TestHarnessTwitterWrapper)
+	tw.timeToFinish = make(chan bool)
 
-	Run(twitterWrapper.timeToFinish, twitterWrapper)
+	Run(tw.timeToFinish, tw)
 
-	if len(twitterWrapper.sentMessages) != 1 {
-		t.Fatalf("Expected 1 sent twitter message got %v", len(twitterWrapper.sentMessages))
+	if len(tw.sentMessages) != 1 {
+		t.Fatalf("Expected 1 sent twitter message got %v", len(tw.sentMessages))
 	}
 }

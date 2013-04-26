@@ -12,7 +12,7 @@ func (tw *FakeTwitterWrapper) DurationUntilNextRead() time.Duration {
 	return 1 * time.Second
 }
 
-func (twitterWrapper *FakeTwitterWrapper) GetUserMentionsTimeline() *twittergo.Timeline {
+func (tw *FakeTwitterWrapper) GetUserMentionsTimeline() *twittergo.Timeline {
 	user := map[string]interface{}{
 		"screen_name": "johnbarton",
 		"id_str":      "123549854887",
@@ -24,6 +24,6 @@ func (twitterWrapper *FakeTwitterWrapper) GetUserMentionsTimeline() *twittergo.T
 	return &twittergo.Timeline{tweet}
 }
 
-func (twitterWrapper *FakeTwitterWrapper) RespondToTweet(tweet *twittergo.Tweet, message string) {
+func (tw *FakeTwitterWrapper) RespondToTweet(tweet *twittergo.Tweet, message string) {
 	fmt.Printf("Hypothetically Send tweet '%v' to '%v'\n", message, tweet.User().ScreenName())
 }
