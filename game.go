@@ -67,9 +67,9 @@ func (repo *StateRepo) SetCurrentSceneForUser(twitterUserId uint64, scene *Scene
 
 func (scene *Scene) DoSomethingMagical(command Command) (nextScene *Scene) {
 	if command.Verb == "go" {
-		if command.Subject == "north" {
+		if command.Subject == "north" && strings.Contains(scene.Description, "north") {
 			nextScene = &Scene{"You're in an empty room. There is a door to the south."}
-		} else if command.Subject == "south" {
+		} else if command.Subject == "south" && strings.Contains(scene.Description, "south") {
 			nextScene = &Scene{"You're in an empty room. There is a door to the north."}
 		}
 	}
