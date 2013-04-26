@@ -3,12 +3,8 @@ package goadventure
 import "strings"
 
 type Game struct {
-	StateRepo
-	openingScene *Scene
-}
-
-type StateRepo struct {
-	scenes map[uint64]*Scene
+	gameStateRepo GameStateRepo
+	openingScene  *Scene
 }
 
 type Scene struct {
@@ -16,14 +12,14 @@ type Scene struct {
 	choices     []*Choice
 }
 
-type Choice struct {
-	command Command
-	scene   *Scene
-}
-
 type Command struct {
 	Verb    string
 	Subject string
+}
+
+type Choice struct {
+	command Command
+	scene   *Scene
 }
 
 func CreateGame() *Game {
@@ -39,8 +35,9 @@ func CreateGame() *Game {
 	roomThree.LinkSceneViaCommand(roomTwo, Command{"go", "east"})
 
 	emptySceneMap := map[uint64]*Scene{}
+	gameStateRepo := &InMemoryGameStateRepo{emptySceneMap}
 	return &Game{
-		StateRepo{emptySceneMap},
+		gameStateRepo,
 		roomOne,
 	}
 }
@@ -57,17 +54,20 @@ func (game *Game) Play(twitterUserId uint64, rawCommand string) string {
 		responseText string
 	)
 
-	currentScene = game.CurrentSceneForUser(twitterUserId)
+	currentScene = game.gameStateRepo.GetCurrentSceneForUser(twitterUserId)
 	if currentScene == nil {
 		// kick off the adventure
-		nextScene = game.OpeningScene()
+		nextScene = game.openingScene
 	} else {
-		command := parseCommand(rawCommand)
+		// should usually be of format "@goadventure go north"
+		words := strings.Fields(rawCommand)
+		command := Command{words[1], words[2]}
+
 		nextScene = currentScene.DoSomethingMagical(command)
 	}
 
 	if nextScene != nil {
-		game.SetCurrentSceneForUser(twitterUserId, nextScene)
+		game.gameStateRepo.SetCurrentSceneForUser(twitterUserId, nextScene)
 		responseText = nextScene.Description
 	} else {
 		responseText = "Sorry Dave, I can't let you do that"
@@ -76,15 +76,15 @@ func (game *Game) Play(twitterUserId uint64, rawCommand string) string {
 	return responseText
 }
 
-func (game *Game) OpeningScene() *Scene {
-	return game.openingScene
+type InMemoryGameStateRepo struct {
+	scenes map[uint64]*Scene
 }
 
-func (repo *StateRepo) CurrentSceneForUser(twitterUserId uint64) *Scene {
+func (repo *InMemoryGameStateRepo) GetCurrentSceneForUser(twitterUserId uint64) *Scene {
 	return repo.scenes[twitterUserId]
 }
 
-func (repo *StateRepo) SetCurrentSceneForUser(twitterUserId uint64, scene *Scene) {
+func (repo *InMemoryGameStateRepo) SetCurrentSceneForUser(twitterUserId uint64, scene *Scene) {
 	repo.scenes[twitterUserId] = scene
 }
 
@@ -96,11 +96,4 @@ func (scene *Scene) DoSomethingMagical(command Command) (nextScene *Scene) {
 		}
 	}
 	return
-}
-
-func parseCommand(rawCommand string) Command {
-	// should usually be of format "@goadventure go north"
-	words := strings.Fields(rawCommand)
-
-	return Command{words[1], words[2]}
 }

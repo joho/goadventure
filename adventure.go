@@ -71,11 +71,7 @@ func Run(stopRunning chan bool, twitterWrapper TwitterWrapper) {
 
 }
 
-type TweetRepo interface {
-	TweetAlreadyHandled(uint64) bool
-	StoreTweetHandled(uint64, string)
-}
-
+// Temporary storage for dev
 type InMemoryTweetRepo struct {
 	tweetsHandled map[uint64]string
 }
