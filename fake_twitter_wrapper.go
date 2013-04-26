@@ -1,8 +1,11 @@
 package goadventure
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/kurrik/twittergo"
+	"os"
+	"strings"
 	"time"
 )
 
@@ -13,7 +16,17 @@ func (tw *FakeTwitterWrapper) DurationUntilNextRead() time.Duration {
 }
 
 func (tw *FakeTwitterWrapper) GetUserMentionsTimeline() *twittergo.Timeline {
-	tweet := createFakeTweetForText("Go North")
+	fmt.Print("Text to tweet @goadventure: ")
+	reader := bufio.NewReader(os.Stdin)
+
+	input, err := reader.ReadString('\n')
+	if err != nil {
+		// fmt.Printf("Error reading tweet text: %s", err)
+		os.Exit(1)
+	}
+	input = strings.TrimSpace(input)
+	tweet := createFakeTweetForText(input)
+
 	fmt.Printf("Hypothetically Receive tweet '%v' from '%v'\n", tweet.Text(), tweet.User().ScreenName())
 	return &twittergo.Timeline{tweet}
 }
