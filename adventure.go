@@ -8,11 +8,13 @@ import (
 
 func Run(stopRunning chan bool, twitterWrapper TwitterWrapper) {
 	var (
-		game *Game
+		game      *Game
+		tweetRepo TweetRepo
 	)
 
 	// set up game world
 	game = CreateGame()
+	tweetRepo = CreateTweetLogger()
 
 	// setup channel for listen loop to tell game loop
 	// about incoming tweets
@@ -22,6 +24,7 @@ func Run(stopRunning chan bool, twitterWrapper TwitterWrapper) {
 
 	// setup listen loop for @mentions
 	go func() {
+
 		var timelineLastReadAt time.Time
 
 	ListenLoop:
@@ -42,21 +45,52 @@ func Run(stopRunning chan bool, twitterWrapper TwitterWrapper) {
 				}
 			}
 		}
+
 	}()
 
 	// setup gameplay loop
 	go func() {
+
 		// fetch tweet off channel
 		for tweet := range tweetChannel {
-			// play the game
-			message := game.Play(tweet.User().Id(), tweet.Text())
+			if !tweetRepo.TweetAlreadyHandled(tweet.Id()) {
+				// play the game
+				message := game.Play(tweet.User().Id(), tweet.Text())
 
-			// tweet at them their "room"
-			twitterWrapper.RespondToTweet(tweet, message)
+				// tweet at them their "room"
+				twitterWrapper.RespondToTweet(tweet, message)
+				tweetRepo.StoreTweetHandled(tweet.Id(), tweet.Text())
+			}
 		}
+
 		waitGroup.Done()
+
 	}()
 
 	waitGroup.Wait()
 
+}
+
+type TweetRepo interface {
+	TweetAlreadyHandled(uint64) bool
+	StoreTweetHandled(uint64, string)
+}
+
+type InMemoryTweetRepo struct {
+	tweetsHandled map[uint64]string
+}
+
+func (repo *InMemoryTweetRepo) TweetAlreadyHandled(tweetId uint64) bool {
+	_, present := repo.tweetsHandled[tweetId]
+	return present
+}
+
+func (repo *InMemoryTweetRepo) StoreTweetHandled(tweetId uint64, tweetContents string) {
+	repo.tweetsHandled[tweetId] = tweetContents
+}
+
+func CreateTweetLogger() TweetRepo {
+	return &InMemoryTweetRepo{
+		map[uint64]string{},
+	}
 }
