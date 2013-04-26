@@ -36,15 +36,11 @@ func CreateGame() *Game {
 
 	emptySceneMap := map[uint64]*Scene{}
 	gameStateRepo := &InMemoryGameStateRepo{emptySceneMap}
+
 	return &Game{
 		gameStateRepo,
 		roomOne,
 	}
-}
-
-func (scene *Scene) LinkSceneViaCommand(nextScene *Scene, command Command) {
-	choice := &Choice{command, nextScene}
-	scene.choices = append(scene.choices, choice)
 }
 
 func (game *Game) Play(twitterUserId uint64, rawCommand string) string {
@@ -76,16 +72,9 @@ func (game *Game) Play(twitterUserId uint64, rawCommand string) string {
 	return responseText
 }
 
-type InMemoryGameStateRepo struct {
-	scenes map[uint64]*Scene
-}
-
-func (repo *InMemoryGameStateRepo) GetCurrentSceneForUser(twitterUserId uint64) *Scene {
-	return repo.scenes[twitterUserId]
-}
-
-func (repo *InMemoryGameStateRepo) SetCurrentSceneForUser(twitterUserId uint64, scene *Scene) {
-	repo.scenes[twitterUserId] = scene
+func (scene *Scene) LinkSceneViaCommand(nextScene *Scene, command Command) {
+	choice := &Choice{command, nextScene}
+	scene.choices = append(scene.choices, choice)
 }
 
 func (scene *Scene) DoSomethingMagical(command Command) (nextScene *Scene) {
@@ -96,4 +85,17 @@ func (scene *Scene) DoSomethingMagical(command Command) (nextScene *Scene) {
 		}
 	}
 	return
+}
+
+// Temporary storage for dev
+type InMemoryGameStateRepo struct {
+	scenes map[uint64]*Scene
+}
+
+func (repo *InMemoryGameStateRepo) GetCurrentSceneForUser(twitterUserId uint64) *Scene {
+	return repo.scenes[twitterUserId]
+}
+
+func (repo *InMemoryGameStateRepo) SetCurrentSceneForUser(twitterUserId uint64, scene *Scene) {
+	repo.scenes[twitterUserId] = scene
 }
