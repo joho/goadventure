@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 )
 
 type RealTwitterWrapper struct {
@@ -20,6 +21,11 @@ func NewRealTwitterWrapper() *RealTwitterWrapper {
 	twitterWrapper := RealTwitterWrapper{client}
 	twitterWrapper.printUserDebugInfo()
 	return &twitterWrapper
+}
+
+func (twitterWrapper *RealTwitterWrapper) DurationUntilNextRead() time.Duration {
+	// TODO make this dynamically look at rate limit stuff
+	return 1 * time.Minute
 }
 
 func (twitterWrapper *RealTwitterWrapper) printUserDebugInfo() {

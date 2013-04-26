@@ -6,8 +6,6 @@ import (
 	"time"
 )
 
-var minDurationBetweenReads = 1 * time.Minute
-
 func Run(stopRunning chan bool, twitterWrapper TwitterWrapper) {
 	var (
 		game *Game
@@ -33,7 +31,7 @@ func Run(stopRunning chan bool, twitterWrapper TwitterWrapper) {
 				close(tweetChannel)
 				break ListenLoop
 			default:
-				if time.Since(timelineLastReadAt) > minDurationBetweenReads {
+				if time.Since(timelineLastReadAt) > twitterWrapper.DurationUntilNextRead() {
 					timelineLastReadAt = time.Now()
 
 					timeline := twitterWrapper.GetUserMentionsTimeline()

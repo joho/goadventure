@@ -3,9 +3,14 @@ package goadventure
 import (
 	"fmt"
 	"github.com/kurrik/twittergo"
+	"time"
 )
 
 type FakeTwitterWrapper struct{}
+
+func (tw *FakeTwitterWrapper) DurationUntilNextRead() time.Duration {
+	return 1 * time.Second
+}
 
 func (twitterWrapper *FakeTwitterWrapper) GetUserMentionsTimeline() *twittergo.Timeline {
 	user := map[string]interface{}{

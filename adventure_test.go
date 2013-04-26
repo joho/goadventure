@@ -3,11 +3,17 @@ package goadventure
 import (
 	"github.com/kurrik/twittergo"
 	"testing"
+	"time"
 )
 
 type TestHarnessTwitterWrapper struct {
 	timeToFinish chan bool
 	sentMessages []string
+}
+
+func (twitterWrapper *TestHarnessTwitterWrapper) DurationUntilNextRead() time.Duration {
+	// TODO make this dynamically look at rate limit stuff
+	return 1 * time.Millisecond
 }
 
 func (twitterWrapper *TestHarnessTwitterWrapper) GetUserMentionsTimeline() *twittergo.Timeline {
