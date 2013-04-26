@@ -31,34 +31,23 @@ func CreateGame() *Game {
 	roomTwo := &Scene{"You're in room two. You can go south or west", nil}
 	roomThree := &Scene{"You're in room three. You can go east", nil}
 
-	choiceRoomOneToTwo := &Choice{
-		Command{"go", "north"},
-		roomTwo,
-	}
-	roomOne.choices = append(roomOne.choices, choiceRoomOneToTwo)
+	roomOne.LinkSceneViaCommand(roomTwo, Command{"go", "north"})
 
-	choiceRoomTwoToOne := &Choice{
-		Command{"go", "south"},
-		roomOne,
-	}
-	roomTwo.choices = append(roomTwo.choices, choiceRoomTwoToOne)
-	choiceRoomTwoToThree := &Choice{
-		Command{"go", "west"},
-		roomThree,
-	}
-	roomTwo.choices = append(roomTwo.choices, choiceRoomTwoToThree)
+	roomTwo.LinkSceneViaCommand(roomOne, Command{"go", "south"})
+	roomTwo.LinkSceneViaCommand(roomThree, Command{"go", "west"})
 
-	choiceRoomThreeToTwo := &Choice{
-		Command{"go", "east"},
-		roomTwo,
-	}
-	roomThree.choices = append(roomThree.choices, choiceRoomThreeToTwo)
+	roomThree.LinkSceneViaCommand(roomTwo, Command{"go", "east"})
 
 	emptySceneMap := map[uint64]*Scene{}
 	return &Game{
 		StateRepo{emptySceneMap},
 		roomOne,
 	}
+}
+
+func (scene *Scene) LinkSceneViaCommand(nextScene *Scene, command Command) {
+	choice := &Choice{command, nextScene}
+	scene.choices = append(scene.choices, choice)
 }
 
 func (game *Game) Play(twitterUserId uint64, rawCommand string) string {
