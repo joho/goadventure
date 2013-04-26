@@ -34,8 +34,7 @@ func CreateGame() *Game {
 
 	roomThree.LinkSceneViaCommand(roomTwo, Command{"go", "east"})
 
-	emptySceneMap := map[uint64]*Scene{}
-	gameStateRepo := &InMemoryGameStateRepo{emptySceneMap}
+	gameStateRepo := CreateGameStateRepo()
 
 	return &Game{
 		gameStateRepo,
@@ -85,17 +84,4 @@ func (scene *Scene) DoSomethingMagical(command Command) (nextScene *Scene) {
 		}
 	}
 	return
-}
-
-// Temporary storage for dev
-type InMemoryGameStateRepo struct {
-	scenes map[uint64]*Scene
-}
-
-func (repo *InMemoryGameStateRepo) GetCurrentSceneForUser(twitterUserId uint64) *Scene {
-	return repo.scenes[twitterUserId]
-}
-
-func (repo *InMemoryGameStateRepo) SetCurrentSceneForUser(twitterUserId uint64, scene *Scene) {
-	repo.scenes[twitterUserId] = scene
 }

@@ -70,23 +70,3 @@ func Run(stopRunning chan bool, twitterWrapper TwitterWrapper) {
 	waitGroup.Wait()
 
 }
-
-// Temporary storage for dev
-type InMemoryTweetRepo struct {
-	tweetsHandled map[uint64]string
-}
-
-func (repo *InMemoryTweetRepo) TweetAlreadyHandled(tweetId uint64) bool {
-	_, present := repo.tweetsHandled[tweetId]
-	return present
-}
-
-func (repo *InMemoryTweetRepo) StoreTweetHandled(tweetId uint64, tweetContents string) {
-	repo.tweetsHandled[tweetId] = tweetContents
-}
-
-func CreateTweetLogger() TweetRepo {
-	return &InMemoryTweetRepo{
-		map[uint64]string{},
-	}
-}

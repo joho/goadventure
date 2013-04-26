@@ -26,7 +26,11 @@ func (tw *TestHarnessTwitterWrapper) GetUserMentionsTimeline() *twittergo.Timeli
 		"user":   user,
 		"id_str": "123543654887",
 	}
-	return &twittergo.Timeline{tweet}
+	// return the same tweet twice to test duplicate handling
+	timeline := &twittergo.Timeline{
+		tweet,
+	}
+	return timeline
 }
 
 func (tw *TestHarnessTwitterWrapper) RespondToTweet(tweet *twittergo.Tweet, message string) {
