@@ -12,7 +12,7 @@ import (
 type FakeTwitterWrapper struct{}
 
 func (tw *FakeTwitterWrapper) DurationUntilNextRead() time.Duration {
-	return 1 * time.Second
+	return 100 * time.Millisecond
 }
 
 func (tw *FakeTwitterWrapper) GetUserMentionsTimeline() *twittergo.Timeline {
