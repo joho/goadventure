@@ -12,6 +12,17 @@ Right now it's a git log of embarrassment as I learn a new programming language.
 
 I haven't decided yet, for right now consider it plain old copyright.
 
+## TODO
+
+  - [x] main game loop with input and output goroutines
+  - [x] read & write from twitter API
+  - [x] have "interactive" mode to mock twitter for dev
+  - [ ] persistently store tweet reply status (for avoiding spam)
+  - [ ] persistently store game state
+  - [x] data structures for game -> scenes -> choices
+  - [ ] file loading/parsing for game data
+  - [ ] robust command parsing/handle synonyms etc
+
 ## Code review notes
 
   * tomb package for proper stopping on control channels
