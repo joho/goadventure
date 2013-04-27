@@ -18,7 +18,7 @@ func (tw *FakeTwitterWrapper) DurationUntilNextRead() time.Duration {
 	return 100 * time.Millisecond
 }
 
-func (tw *FakeTwitterWrapper) GetUserMentionsTimeline() *twittergo.Timeline {
+func (tw *FakeTwitterWrapper) GetUserMentionsTimeline(tweetChannel chan *twittergo.Tweet) {
 	fmt.Print("Text to tweet @goadventure: ")
 	reader := bufio.NewReader(os.Stdin)
 
@@ -31,7 +31,8 @@ func (tw *FakeTwitterWrapper) GetUserMentionsTimeline() *twittergo.Timeline {
 	tweet := tw.createFakeTweetForText(input)
 
 	fmt.Printf("Hypothetically Receive tweet '%v' from '%v'\n", tweet.Text(), tweet.User().ScreenName())
-	return &twittergo.Timeline{tweet}
+
+	tweetChannel <- &tweet
 }
 
 func (tw *FakeTwitterWrapper) RespondToTweet(tweet *twittergo.Tweet, message string) {

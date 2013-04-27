@@ -39,13 +39,22 @@ func (tw *RealTwitterWrapper) printUserDebugInfo() {
 	printResponseRateLimits(resp)
 }
 
-func (tw *RealTwitterWrapper) GetUserMentionsTimeline() (timeline *twittergo.Timeline) {
-	var resp *twittergo.APIResponse
+func (tw *RealTwitterWrapper) GetUserMentionsTimeline(tweetChannel chan *twittergo.Tweet) {
+	var (
+		resp     *twittergo.APIResponse
+		timeline *twittergo.Timeline
+	)
+
 	timeline = &twittergo.Timeline{}
+
 	resp = tw.doGetRequest("/1.1/statuses/mentions_timeline.json")
 	parseWithErrorHandling(resp, timeline)
+
 	fmt.Printf("Num Mentions:   %v\n", len(*timeline))
-	return
+
+	for _, tweet := range *timeline {
+		tweetChannel <- &tweet
+	}
 }
 
 func (tw *RealTwitterWrapper) RespondToTweet(tweet *twittergo.Tweet, message string) {

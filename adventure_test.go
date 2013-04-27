@@ -1,6 +1,7 @@
 package goadventure
 
 import (
+	"fmt"
 	"github.com/kurrik/twittergo"
 	"testing"
 	"time"
@@ -15,7 +16,7 @@ func (tw *TestHarnessTwitterWrapper) DurationUntilNextRead() time.Duration {
 	return 1 * time.Millisecond
 }
 
-func (tw *TestHarnessTwitterWrapper) GetUserMentionsTimeline() *twittergo.Timeline {
+func (tw *TestHarnessTwitterWrapper) GetUserMentionsTimeline(tweetChannel chan *twittergo.Tweet) {
 	user := map[string]interface{}{
 		"screen_name": "johnbarton",
 		"id_str":      "123549854887",
@@ -25,16 +26,14 @@ func (tw *TestHarnessTwitterWrapper) GetUserMentionsTimeline() *twittergo.Timeli
 		"user":   user,
 		"id_str": "123543654887",
 	}
-	// return the same tweet twice to test duplicate handling
-	timeline := &twittergo.Timeline{
-		tweet,
-	}
-	return timeline
+
+	tweetChannel <- &tweet
 }
 
 func (tw *TestHarnessTwitterWrapper) RespondToTweet(tweet *twittergo.Tweet, message string) {
 	tw.sentMessages = append(tw.sentMessages, message)
 	tw.timeToFinish <- true
+	fmt.Println(len(tw.sentMessages))
 }
 
 func TestRun(t *testing.T) {

@@ -31,20 +31,16 @@ func Run(stopRunning chan bool, twitterWrapper TwitterWrapper) {
 		for {
 			select {
 			case <-stopRunning:
-				close(tweetChannel)
 				break ListenLoop
 			default:
 				if time.Since(timelineLastReadAt) > twitterWrapper.DurationUntilNextRead() {
-					timeline := twitterWrapper.GetUserMentionsTimeline()
+					twitterWrapper.GetUserMentionsTimeline(tweetChannel)
 					timelineLastReadAt = time.Now()
-
-					// each tweet mentioned stuff onto channel
-					for _, tweet := range *timeline {
-						tweetChannel <- &tweet
-					}
 				}
 			}
 		}
+
+		close(tweetChannel)
 
 	}()
 

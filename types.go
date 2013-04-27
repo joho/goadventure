@@ -7,7 +7,7 @@ import (
 
 type TwitterWrapper interface {
 	DurationUntilNextRead() time.Duration
-	GetUserMentionsTimeline() *twittergo.Timeline
+	GetUserMentionsTimeline(chan *twittergo.Tweet)
 	RespondToTweet(*twittergo.Tweet, string)
 }
 
