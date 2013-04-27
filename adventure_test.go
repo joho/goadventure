@@ -12,7 +12,6 @@ type TestHarnessTwitterWrapper struct {
 }
 
 func (tw *TestHarnessTwitterWrapper) DurationUntilNextRead() time.Duration {
-	// TODO make this dynamically look at rate limit stuff
 	return 1 * time.Millisecond
 }
 
