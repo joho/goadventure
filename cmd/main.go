@@ -11,27 +11,36 @@ import (
 )
 
 func main() {
+	var (
+		twitterWrapper goadventure.TwitterWrapper
+	)
+
+	fmt.Println("Server starting up. SIGINT (CTRL+C) to quit.")
+	// Use all the threads.
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	useLiveTwitterClient := flag.Bool("live-twitter", false, "set to actually talk to live twitter")
-	flag.Parse()
-
-	fmt.Println("Server starting up. CTRL+C to quit (may take a few seconds)")
+	// Setup go routine for signal management
 	stopRunning := make(chan bool)
 	go func() {
 		signalChannel := make(chan os.Signal)
 		signal.Notify(signalChannel, syscall.SIGINT)
 
 		<-signalChannel
-		fmt.Println("\n\nCTRL+C Received, will eventually halt")
+		fmt.Println("\n\nSIGINT Received, Shutting Down")
 		stopRunning <- true
+		close(stopRunning)
 	}()
 
+	useLiveTwitterClient := flag.Bool("live-twitter", false, "set to actually talk to live twitter")
+	flag.Parse()
+
 	if *useLiveTwitterClient {
-		fmt.Println("Using real twitter wrapper (-live-twitter has been set)")
-		goadventure.Run(stopRunning, goadventure.NewRealTwitterWrapper())
+		fmt.Println("Using Twitter API for input/output")
+		twitterWrapper = goadventure.NewRealTwitterWrapper()
 	} else {
-		fmt.Println("Using fake twitter wrapper (use -live-twitter flag to do fo' reals)")
-		goadventure.Run(stopRunning, new(goadventure.FakeTwitterWrapper))
+		fmt.Println("Using interactive input/output")
+		twitterWrapper = new(goadventure.FakeTwitterWrapper)
 	}
+
+	goadventure.Run(stopRunning, twitterWrapper)
 }
