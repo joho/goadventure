@@ -39,8 +39,9 @@ func (tw *TestHarnessTwitterWrapper) RespondToTweet(tweet *twittergo.Tweet, mess
 func TestRun(t *testing.T) {
 	tw := new(TestHarnessTwitterWrapper)
 	tw.timeToFinish = make(chan bool)
+	storageEngine := NewInMemoryStorageEngine()
 
-	Run(tw.timeToFinish, tw)
+	Run(tw.timeToFinish, tw, storageEngine)
 
 	if len(tw.sentMessages) != 1 {
 		t.Fatalf("Expected 1 sent twitter message got %v", len(tw.sentMessages))

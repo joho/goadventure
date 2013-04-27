@@ -3,7 +3,7 @@ package goadventure
 import "strings"
 
 type Game struct {
-	gameStateRepo GameStateRepo
+	storageEngine StorageEngine
 	openingScene  *Scene
 }
 
@@ -22,7 +22,7 @@ type Choice struct {
 	scene   *Scene
 }
 
-func CreateGame() *Game {
+func CreateGame(storageEngine StorageEngine) *Game {
 	roomOne := &Scene{"Welcome to room one. You can go north.", nil}
 	roomTwo := &Scene{"You're in room two. You can go south or west", nil}
 	roomThree := &Scene{"You're in room three. You can go east", nil}
@@ -34,10 +34,8 @@ func CreateGame() *Game {
 
 	roomThree.LinkSceneViaCommand(roomTwo, Command{"go", "east"})
 
-	gameStateRepo := CreateGameStateRepo()
-
 	return &Game{
-		gameStateRepo,
+		storageEngine,
 		roomOne,
 	}
 }
@@ -49,7 +47,7 @@ func (game *Game) Play(twitterUserId uint64, rawCommand string) string {
 		responseText string
 	)
 
-	currentScene = game.gameStateRepo.GetCurrentSceneForUser(twitterUserId)
+	currentScene = game.storageEngine.GetCurrentSceneForUser(twitterUserId)
 	if currentScene == nil {
 		// kick off the adventure
 		nextScene = game.openingScene
@@ -62,7 +60,7 @@ func (game *Game) Play(twitterUserId uint64, rawCommand string) string {
 	}
 
 	if nextScene != nil {
-		game.gameStateRepo.SetCurrentSceneForUser(twitterUserId, nextScene)
+		game.storageEngine.SetCurrentSceneForUser(twitterUserId, nextScene)
 		responseText = nextScene.Description
 	} else {
 		responseText = "Sorry Dave, I can't let you do that"

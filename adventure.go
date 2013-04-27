@@ -6,15 +6,13 @@ import (
 	"time"
 )
 
-func Run(stopRunning chan bool, twitterWrapper TwitterWrapper) {
+func Run(stopRunning chan bool, twitterWrapper TwitterWrapper, storageEngine StorageEngine) {
 	var (
-		game      *Game
-		tweetRepo TweetRepo
+		game *Game
 	)
 
 	// set up game world
-	game = CreateGame()
-	tweetRepo = CreateTweetLogger()
+	game = CreateGame(storageEngine)
 
 	// setup channel for listen loop to tell game loop
 	// about incoming tweets
@@ -49,13 +47,13 @@ func Run(stopRunning chan bool, twitterWrapper TwitterWrapper) {
 
 		// fetch tweet off channel
 		for tweet := range tweetChannel {
-			if !tweetRepo.TweetAlreadyHandled(tweet.Id()) {
+			if !storageEngine.TweetAlreadyHandled(tweet.Id()) {
 				// play the game
 				message := game.Play(tweet.User().Id(), tweet.Text())
 
 				// tweet at them their "room"
 				twitterWrapper.RespondToTweet(tweet, message)
-				tweetRepo.StoreTweetHandled(tweet.Id(), tweet.Text())
+				storageEngine.StoreTweetHandled(tweet.Id(), tweet.Text())
 			}
 		}
 

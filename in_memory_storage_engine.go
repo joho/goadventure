@@ -6,14 +6,7 @@ type InMemoryStorageEngine struct {
 	tweetsHandled map[uint64]string
 }
 
-func CreateTweetLogger() TweetRepo {
-	return &InMemoryStorageEngine{
-		map[uint64]*Scene{},
-		map[uint64]string{},
-	}
-}
-
-func CreateGameStateRepo() GameStateRepo {
+func NewInMemoryStorageEngine() StorageEngine {
 	return &InMemoryStorageEngine{
 		map[uint64]*Scene{},
 		map[uint64]string{},

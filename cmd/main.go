@@ -13,6 +13,7 @@ import (
 func main() {
 	var (
 		twitterWrapper goadventure.TwitterWrapper
+		storageEngine  goadventure.StorageEngine
 	)
 
 	fmt.Println("Server starting up. SIGINT (CTRL+C) to quit.")
@@ -31,7 +32,9 @@ func main() {
 		close(stopRunning)
 	}()
 
+	// Command line flags
 	useLiveTwitterClient := flag.Bool("live-twitter", false, "set to actually talk to live twitter")
+	usePersistentStorage := flag.Bool("persistent-storage", false, "set to use persistent storage for game state")
 	flag.Parse()
 
 	if *useLiveTwitterClient {
@@ -42,5 +45,11 @@ func main() {
 		twitterWrapper = new(goadventure.FakeTwitterWrapper)
 	}
 
-	goadventure.Run(stopRunning, twitterWrapper)
+	if *usePersistentStorage {
+	} else {
+		storageEngine = goadventure.NewInMemoryStorageEngine()
+	}
+
+	// Let's play!
+	goadventure.Run(stopRunning, twitterWrapper, storageEngine)
 }
