@@ -46,6 +46,7 @@ func main() {
 	}
 
 	if *usePersistentStorage {
+		// TODO build some persistent storage
 	} else {
 		storageEngine = goadventure.NewInMemoryStorageEngine()
 	}
