@@ -23,6 +23,7 @@ I haven't decided yet, for right now consider it plain old copyright.
   - [x] data structures for game -> scenes -> choices
   - [ ] file loading/parsing for game data
   - [ ] robust command parsing/handle synonyms etc
+  - [ ] Write the most baller choice your own adventure in all the lands.
 
 ## Code review notes
 
