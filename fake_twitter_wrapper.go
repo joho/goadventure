@@ -19,7 +19,7 @@ func (tw *FakeTwitterWrapper) DurationUntilNextRead() time.Duration {
 }
 
 func (tw *FakeTwitterWrapper) GetUserMentionsTimeline(tweetChannel chan *twittergo.Tweet) {
-	fmt.Print("Text to tweet @goadventure: ")
+	fmt.Print("Text to tweet @goadventure (q to quit): ")
 	reader := bufio.NewReader(os.Stdin)
 
 	input, err := reader.ReadString('\n')
@@ -28,11 +28,15 @@ func (tw *FakeTwitterWrapper) GetUserMentionsTimeline(tweetChannel chan *twitter
 		os.Exit(1)
 	}
 	input = strings.TrimSpace(input)
-	tweet := tw.createFakeTweetForText(input)
+	if input == "q" {
+		close(tweetChannel)
+	} else {
+		tweet := tw.createFakeTweetForText(input)
 
-	fmt.Printf("Hypothetically Receive tweet '%v' from '%v'\n", tweet.Text(), tweet.User().ScreenName())
+		fmt.Printf("Hypothetically Receive tweet '%v' from '%v'\n", tweet.Text(), tweet.User().ScreenName())
 
-	tweetChannel <- &tweet
+		tweetChannel <- &tweet
+	}
 }
 
 func (tw *FakeTwitterWrapper) RespondToTweet(tweet *twittergo.Tweet, message string) {
