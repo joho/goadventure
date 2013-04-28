@@ -14,6 +14,8 @@ type PersistentStorageEngine struct {
 func NewPersistentStorageEngine() StorageEngine {
 	storageEngine := new(PersistentStorageEngine)
 
+	// TODO set up a folder structure for < 1k entries per folder
+	// actual TODO set up a proper datastore
 	flatTransform := func(s string) []string { return []string{} }
 	storageEngine.tweetStore = diskv.New(diskv.Options{
 		BasePath:     "storage/tweets",
