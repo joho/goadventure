@@ -1,5 +1,6 @@
 package goadventure
 
+// import "fmt"
 import "strings"
 
 type Game struct {
@@ -47,7 +48,6 @@ func (game *Game) Play(twitterUserId uint64, rawCommand string) string {
 		nextScene    *Scene
 		responseText string
 	)
-
 	currentScene = game.GetCurrentSceneForUser(twitterUserId)
 	if currentScene == nil {
 		// kick off the adventure
@@ -55,9 +55,10 @@ func (game *Game) Play(twitterUserId uint64, rawCommand string) string {
 	} else {
 		// should usually be of format "@goadventure go north"
 		words := strings.Fields(rawCommand)
-		command := Command{words[1], words[2]}
-
-		nextScene = currentScene.DoSomethingMagical(command)
+		if len(words) >= 3 {
+			command := Command{words[1], words[2]}
+			nextScene = currentScene.DoSomethingMagical(command)
+		}
 	}
 
 	if nextScene != nil {
@@ -75,9 +76,8 @@ func (game *Game) SetCurrentSceneForUser(twitterUserId uint64, scene *Scene) {
 }
 
 func (game *Game) GetCurrentSceneForUser(twitterUserId uint64) *Scene {
-	sceneId, err := game.storageEngine.GetCurrentSceneIdForUser(twitterUserId)
-	if err != nil {
-		// early return if storage borks
+	sceneId, _ := game.storageEngine.GetCurrentSceneIdForUser(twitterUserId)
+	if sceneId == -1 {
 		return nil
 	}
 
@@ -111,6 +111,13 @@ func (scene *Scene) LinkSceneViaCommand(nextScene *Scene, command Command) {
 }
 
 func (scene *Scene) DoSomethingMagical(command Command) (nextScene *Scene) {
+	// remind the user where they are if they want to look around
+	if command.Verb == "look" && command.Subject == "around" {
+		nextScene = scene
+		return
+	}
+
+	// check all choices from the current scene for a command match
 	for _, choice := range scene.choices {
 		if choice.command == command {
 			nextScene = choice.scene
