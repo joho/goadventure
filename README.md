@@ -17,13 +17,13 @@ I haven't decided yet, for right now consider it plain old copyright.
   - [x] main game loop with input and output goroutines
   - [x] read & write from twitter API
   - [x] have "interactive" mode to mock twitter for dev
-  - [ ] investigate [github.com/peterbourgon/diskv](https://github.com/peterbourgon/diskv) for persistance
-  - [ ] persistently store tweet reply status (for avoiding spam)
-  - [ ] persistently store game state
+  - [x] persistently store tweet reply status (for avoiding spam)
+  - [x] persistently store game state
   - [x] data structures for game -> scenes -> choices
   - [ ] file loading/parsing for game data
   - [ ] robust command parsing/handle synonyms etc
-  - [ ] Write the most baller choice your own adventure in all the lands.
+  - [ ] Handle twitter "duplicate" errors (code 187)
+  - [ ] Write the most baller choose your own adventure script in all the lands.
 
 ## Code review notes
 
