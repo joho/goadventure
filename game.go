@@ -1,7 +1,10 @@
 package goadventure
 
-import "log"
-import "strings"
+import (
+	"errors"
+	"log"
+	"strings"
+)
 
 type Game struct {
 	storageEngine StorageEngine
@@ -53,14 +56,7 @@ func (game *Game) Play(twitterUserId uint64, rawCommand string) string {
 		// kick off the adventure
 		nextScene = game.openingScene
 	} else {
-		// should usually be of format "@goadventuregame go north"
-		words := strings.Fields(rawCommand)
-		if len(words) >= 3 {
-			command := Command{words[1], words[2]}
-			nextScene = currentScene.DoSomethingMagical(command)
-		} else {
-			log.Printf("Bad command received: \"%v\" on scene \"%v\"\n", rawCommand, currentScene.Description)
-		}
+		nextScene = currentScene.DoSomethingMagical(rawCommand)
 	}
 
 	if nextScene != nil {
@@ -112,7 +108,12 @@ func (scene *Scene) LinkSceneViaCommand(nextScene *Scene, command Command) {
 	scene.choices = append(scene.choices, choice)
 }
 
-func (scene *Scene) DoSomethingMagical(command Command) (nextScene *Scene) {
+func (scene *Scene) DoSomethingMagical(rawCommand string) (nextScene *Scene) {
+	command, err := scene.parseCommand(rawCommand)
+	if err != nil {
+		return
+	}
+
 	// remind the user where they are if they want to look around
 	if command.Verb == "look" && command.Subject == "around" {
 		nextScene = scene
@@ -125,6 +126,18 @@ func (scene *Scene) DoSomethingMagical(command Command) (nextScene *Scene) {
 			nextScene = choice.scene
 			break
 		}
+	}
+	return
+}
+
+func (scene *Scene) parseCommand(rawCommand string) (command Command, err error) {
+	// should usually be of format "@goadventuregame go north"
+	words := strings.Fields(rawCommand)
+	if len(words) < 3 {
+		log.Printf("Bad command received: \"%v\" on scene \"%v\"\n", rawCommand, scene.Description)
+		err = errors.New("Not enough words in command")
+	} else {
+		command = Command{words[1], words[2]}
 	}
 	return
 }
