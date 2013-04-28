@@ -6,6 +6,15 @@ import (
 	"time"
 )
 
+/*
+	Main game loop.
+
+	* stopRunning is the control channel, pass a "true" onto it and the game loop will halt as soon as possible
+
+	* twitterWrapper is the input/output wrapper for the game. In dev you can pass in an interactive wrapper to drive the game from the command line
+
+	* storageEngine is how game state & tweets are stored. Use the InMemoryStorageEngine for playing around in dev.
+*/
 func Run(stopRunning chan bool, twitterWrapper TwitterWrapper, storageEngine StorageEngine) {
 	var (
 		game *Game
