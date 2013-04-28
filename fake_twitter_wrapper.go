@@ -11,7 +11,13 @@ import (
 )
 
 type FakeTwitterWrapper struct {
-	currentTweetId int
+	currentTweetId uint64
+}
+
+func NewFakeTwitterWrapper() TwitterWrapper {
+	return &FakeTwitterWrapper{
+		uint64(time.Now().Unix()),
+	}
 }
 
 func (tw *FakeTwitterWrapper) DurationUntilNextRead() time.Duration {
@@ -52,7 +58,7 @@ func (tw *FakeTwitterWrapper) createFakeTweetForText(tweetText string) twittergo
 	tweet := twittergo.Tweet{
 		"text":   "@gotextadventure " + tweetText,
 		"user":   user,
-		"id_str": strconv.Itoa(tw.currentTweetId),
+		"id_str": strconv.FormatUint(tw.currentTweetId, 10),
 	}
 	return tweet
 }

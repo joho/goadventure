@@ -42,7 +42,7 @@ func main() {
 		twitterWrapper = goadventure.NewRealTwitterWrapper()
 	} else {
 		fmt.Println("Using interactive input/output")
-		twitterWrapper = new(goadventure.FakeTwitterWrapper)
+		twitterWrapper = goadventure.NewFakeTwitterWrapper()
 	}
 
 	if *usePersistentStorage {
