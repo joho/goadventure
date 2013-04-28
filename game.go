@@ -1,6 +1,6 @@
 package goadventure
 
-// import "fmt"
+import "fmt"
 import "strings"
 
 type Game struct {
@@ -53,9 +53,10 @@ func (game *Game) Play(twitterUserId uint64, rawCommand string) string {
 		// kick off the adventure
 		nextScene = game.openingScene
 	} else {
-		// should usually be of format "@goadventure go north"
+		// should usually be of format "@goadventuregame go north"
 		words := strings.Fields(rawCommand)
 		if len(words) >= 3 {
+			fmt.Printf("Bad command received: %v\n", rawCommand)
 			command := Command{words[1], words[2]}
 			nextScene = currentScene.DoSomethingMagical(command)
 		}
