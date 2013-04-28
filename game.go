@@ -75,7 +75,11 @@ func (game *Game) SetCurrentSceneForUser(twitterUserId uint64, scene *Scene) {
 }
 
 func (game *Game) GetCurrentSceneForUser(twitterUserId uint64) *Scene {
-	sceneId := game.storageEngine.GetCurrentSceneIdForUser(twitterUserId)
+	sceneId, err := game.storageEngine.GetCurrentSceneIdForUser(twitterUserId)
+	if err != nil {
+		// early return if storage borks
+		return nil
+	}
 
 	// I have a sneaking suspicion that this recursive tree walk
 	// is not exactly *idiomatic* go

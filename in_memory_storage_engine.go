@@ -13,8 +13,8 @@ func NewInMemoryStorageEngine() StorageEngine {
 	}
 }
 
-func (repo *InMemoryStorageEngine) GetCurrentSceneIdForUser(twitterUserId uint64) int {
-	return repo.scenes[twitterUserId]
+func (repo *InMemoryStorageEngine) GetCurrentSceneIdForUser(twitterUserId uint64) (int, error) {
+	return repo.scenes[twitterUserId], nil
 }
 
 func (repo *InMemoryStorageEngine) SetCurrentSceneIdForUser(twitterUserId uint64, sceneId int) {
