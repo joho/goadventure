@@ -112,6 +112,7 @@ func (tw *RealTwitterWrapper) doGetRequest(api_path string) (resp *twittergo.API
 
 func parseWithErrorHandling(resp *twittergo.APIResponse, out interface{}) {
 	err := resp.Parse(out)
+	// TODO recover from 2013/04/28 14:16:32 Problem parsing response: Error 187: Status is a duplicate.
 	if err != nil {
 		log.Fatalf("Problem parsing response: %v\n", err)
 	}
