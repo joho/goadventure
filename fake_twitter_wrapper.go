@@ -30,7 +30,6 @@ func (tw *FakeTwitterWrapper) GetUserMentionsTimeline(tweetChannel chan *twitter
 
 	input, err := reader.ReadString('\n')
 	if err != nil {
-		// fmt.Printf("Error reading tweet text: %s", err)
 		os.Exit(1)
 	}
 	input = strings.TrimSpace(input)

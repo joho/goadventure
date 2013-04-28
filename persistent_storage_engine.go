@@ -1,8 +1,8 @@
 package goadventure
 
 import (
-	"fmt"
 	"github.com/peterbourgon/diskv"
+	"log"
 	"strconv"
 )
 
@@ -32,9 +32,9 @@ func NewPersistentStorageEngine() StorageEngine {
 }
 
 func (repo *PersistentStorageEngine) GetCurrentSceneIdForUser(twitterUserId uint64) (int, error) {
-	rawValue, err := repo.gameStateStore.Read(strconv.FormatUint(twitterUserId, 10))
+	rawValue, err := repo.gameStateStore.Read(repo.translateKey(twitterUserId))
 	if err != nil {
-		fmt.Printf("Read \"%v\" as rawValue with \"%v\" as err\n", rawValue, err)
+		log.Printf("Read \"%v\" as rawValue with \"%v\" as err\n", rawValue, err)
 		return -1, err
 	}
 	value, err := strconv.Atoi(string(rawValue))
@@ -42,17 +42,19 @@ func (repo *PersistentStorageEngine) GetCurrentSceneIdForUser(twitterUserId uint
 }
 
 func (repo *PersistentStorageEngine) SetCurrentSceneIdForUser(twitterUserId uint64, sceneId int) {
-	key := strconv.FormatUint(twitterUserId, 10)
 	value := strconv.Itoa(sceneId)
-	repo.gameStateStore.Write(key, []byte(value))
+	repo.gameStateStore.Write(repo.translateKey(twitterUserId), []byte(value))
 }
 
 func (repo *PersistentStorageEngine) TweetAlreadyHandled(tweetId uint64) bool {
-	_, err := repo.tweetStore.Read(strconv.FormatUint(tweetId, 10))
+	_, err := repo.tweetStore.Read(repo.translateKey(tweetId))
 	return err == nil
 }
 
 func (repo *PersistentStorageEngine) StoreTweetHandled(tweetId uint64, tweetContents string) {
-	key := strconv.FormatUint(tweetId, 10)
-	repo.tweetStore.Write(key, []byte(tweetContents))
+	repo.tweetStore.Write(repo.translateKey(tweetId), []byte(tweetContents))
+}
+
+func (_ *PersistentStorageEngine) translateKey(rawKey uint64) string {
+	return strconv.FormatUint(rawKey, 10)
 }

@@ -1,7 +1,6 @@
 package goadventure
 
 import (
-	"fmt"
 	"github.com/kurrik/twittergo"
 	"sync"
 	"time"
@@ -48,9 +47,7 @@ func Run(stopRunning chan bool, twitterWrapper TwitterWrapper, storageEngine Sto
 
 		// fetch tweet off channel
 		for tweet := range tweetChannel {
-			if storageEngine.TweetAlreadyHandled(tweet.Id()) {
-				fmt.Printf("Ignoring Tweet id %v as it's already handled\n", tweet.Id())
-			} else {
+			if !storageEngine.TweetAlreadyHandled(tweet.Id()) {
 				// play the game
 				message := game.Play(tweet.User().Id(), tweet.Text())
 

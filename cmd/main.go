@@ -2,8 +2,8 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/joho/goadventure"
+	"log"
 	"os"
 	"os/signal"
 	"runtime"
@@ -16,7 +16,7 @@ func main() {
 		storageEngine  goadventure.StorageEngine
 	)
 
-	fmt.Println("Server starting up. SIGINT (CTRL+C) to quit.")
+	log.Println("Server starting up. SIGINT (CTRL+C) to quit.")
 	// Use all the threads.
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
@@ -27,7 +27,7 @@ func main() {
 		signal.Notify(signalChannel, syscall.SIGINT)
 
 		<-signalChannel
-		fmt.Println("\n\nSIGINT Received, Shutting Down")
+		log.Println("\n\nSIGINT Received, Shutting Down")
 		stopRunning <- true
 		close(stopRunning)
 	}()
@@ -38,18 +38,18 @@ func main() {
 	flag.Parse()
 
 	if *useLiveTwitterClient {
-		fmt.Println("Using Twitter API for input/output")
+		log.Println("Using Twitter API for input/output")
 		twitterWrapper = goadventure.NewRealTwitterWrapper()
 	} else {
-		fmt.Println("Using interactive input/output")
+		log.Println("Using interactive input/output")
 		twitterWrapper = goadventure.NewFakeTwitterWrapper()
 	}
 
 	if *usePersistentStorage {
-		fmt.Println("Using persistent storage for game state")
+		log.Println("Using persistent storage for game state")
 		storageEngine = goadventure.NewPersistentStorageEngine()
 	} else {
-		fmt.Println("Using in memory storage for game state")
+		log.Println("Using in memory storage for game state")
 		storageEngine = goadventure.NewInMemoryStorageEngine()
 	}
 

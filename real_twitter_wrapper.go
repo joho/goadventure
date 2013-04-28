@@ -34,8 +34,8 @@ func (tw *RealTwitterWrapper) printUserDebugInfo() {
 	resp = tw.doGetRequest("/1.1/account/verify_credentials.json")
 	parseWithErrorHandling(resp, user)
 
-	fmt.Printf("ID:                   %v\n", user.Id())
-	fmt.Printf("Name:                 %v\n", user.Name())
+	log.Printf("ID:                   %v\n", user.Id())
+	log.Printf("Name:                 %v\n", user.Name())
 	printResponseRateLimits(resp)
 }
 
@@ -50,7 +50,7 @@ func (tw *RealTwitterWrapper) GetUserMentionsTimeline(tweetChannel chan *twitter
 	resp = tw.doGetRequest("/1.1/statuses/mentions_timeline.json")
 	parseWithErrorHandling(resp, timeline)
 
-	fmt.Printf("Num Mentions:   %v\n", len(*timeline))
+	log.Printf("Num Mentions:   %v\n", len(*timeline))
 
 	for _, tweet := range *timeline {
 		tweetChannel <- &tweet
@@ -120,11 +120,11 @@ func parseWithErrorHandling(resp *twittergo.APIResponse, out interface{}) {
 
 func printResponseRateLimits(resp *twittergo.APIResponse) {
 	if resp.HasRateLimit() {
-		fmt.Printf("Rate limit:           %v\n", resp.RateLimit())
-		fmt.Printf("Rate limit remaining: %v\n", resp.RateLimitRemaining())
-		fmt.Printf("Rate limit reset:     %v\n", resp.RateLimitReset())
+		log.Printf("Rate limit:           %v\n", resp.RateLimit())
+		log.Printf("Rate limit remaining: %v\n", resp.RateLimitRemaining())
+		log.Printf("Rate limit reset:     %v\n", resp.RateLimitReset())
 	} else {
-		fmt.Printf("Could not parse rate limit from response.\n")
+		log.Printf("Could not parse rate limit from response.\n")
 	}
 }
 

@@ -1,7 +1,6 @@
 package goadventure
 
 import (
-	"fmt"
 	"github.com/kurrik/twittergo"
 	"testing"
 	"time"
@@ -33,7 +32,6 @@ func (tw *TestHarnessTwitterWrapper) GetUserMentionsTimeline(tweetChannel chan *
 func (tw *TestHarnessTwitterWrapper) RespondToTweet(tweet *twittergo.Tweet, message string) {
 	tw.sentMessages = append(tw.sentMessages, message)
 	tw.timeToFinish <- true
-	fmt.Println(len(tw.sentMessages))
 }
 
 func TestRun(t *testing.T) {
