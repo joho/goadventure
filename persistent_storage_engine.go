@@ -1,6 +1,7 @@
 package goadventure
 
 import (
+	"fmt"
 	"github.com/peterbourgon/diskv"
 	"strconv"
 )
@@ -29,7 +30,11 @@ func NewPersistentStorageEngine() StorageEngine {
 }
 
 func (repo *PersistentStorageEngine) GetCurrentSceneIdForUser(twitterUserId uint64) (int, error) {
-	rawValue, err := repo.tweetStore.Read(strconv.FormatUint(twitterUserId, 10))
+	rawValue, err := repo.gameStateStore.Read(strconv.FormatUint(twitterUserId, 10))
+	if err != nil {
+		fmt.Printf("Read \"%v\" as rawValue with \"%v\" as err\n", rawValue, err)
+		return -1, err
+	}
 	value, err := strconv.Atoi(string(rawValue))
 	return value, err
 }
