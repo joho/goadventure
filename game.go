@@ -51,6 +51,7 @@ func (game *Game) Play(twitterUserId uint64, rawCommand string) string {
 		nextScene    *Scene
 		responseText string
 	)
+
 	currentScene = game.GetCurrentSceneForUser(twitterUserId)
 	if currentScene == nil {
 		// kick off the adventure
