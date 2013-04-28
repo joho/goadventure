@@ -1,30 +1,36 @@
 package goadventure
 
+import (
+	"github.com/peterbourgon/diskv"
+)
+
 type PersistentStorageEngine struct {
-	scenes        map[uint64]*Scene
-	tweetsHandled map[uint64]string
+	diskvStore *diskv.Diskv
 }
 
 func NewPersistentStorageEngine() StorageEngine {
-	return &PersistentStorageEngine{
-		map[uint64]*Scene{},
-		map[uint64]string{},
-	}
+	storageEngine := new(PersistentStorageEngine)
+
+	flatTransform := func(s string) []string { return []string{} }
+	storageEngine.diskvStore = diskv.New(diskv.Options{
+		BasePath:     "diskv-store",
+		Transform:    flatTransform,
+		CacheSizeMax: 1024 * 1024,
+	})
+
+	return storageEngine
 }
 
-func (repo *PersistentStorageEngine) GetCurrentSceneForUser(twitterUserId uint64) *Scene {
-	return repo.scenes[twitterUserId]
+func (repo *PersistentStorageEngine) GetCurrentSceneIdForUser(twitterUserId uint64) int {
+	return 1
 }
 
-func (repo *PersistentStorageEngine) SetCurrentSceneForUser(twitterUserId uint64, scene *Scene) {
-	repo.scenes[twitterUserId] = scene
+func (repo *PersistentStorageEngine) SetCurrentSceneIdForUser(twitterUserId uint64, sceneId int) {
 }
 
 func (repo *PersistentStorageEngine) TweetAlreadyHandled(tweetId uint64) bool {
-	_, present := repo.tweetsHandled[tweetId]
-	return present
+	return false
 }
 
 func (repo *PersistentStorageEngine) StoreTweetHandled(tweetId uint64, tweetContents string) {
-	repo.tweetsHandled[tweetId] = tweetContents
 }

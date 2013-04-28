@@ -46,8 +46,10 @@ func main() {
 	}
 
 	if *usePersistentStorage {
+		fmt.Println("Using persistent storage for game state")
 		storageEngine = goadventure.NewPersistentStorageEngine()
 	} else {
+		fmt.Println("Using in memory storage for game state")
 		storageEngine = goadventure.NewInMemoryStorageEngine()
 	}
 

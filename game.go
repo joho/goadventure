@@ -8,6 +8,7 @@ type Game struct {
 }
 
 type Scene struct {
+	id          int
 	Description string
 	choices     []*Choice
 }
@@ -23,9 +24,9 @@ type Choice struct {
 }
 
 func CreateGame(storageEngine StorageEngine) *Game {
-	roomOne := &Scene{"Welcome to room one. You can go north.", nil}
-	roomTwo := &Scene{"You're in room two. You can go south or west", nil}
-	roomThree := &Scene{"You're in room three. You can go east", nil}
+	roomOne := &Scene{1, "Welcome to room one. You can go north.", nil}
+	roomTwo := &Scene{2, "You're in room two. You can go south or west", nil}
+	roomThree := &Scene{3, "You're in room three. You can go east", nil}
 
 	roomOne.LinkSceneViaCommand(roomTwo, Command{"go", "north"})
 
@@ -47,7 +48,7 @@ func (game *Game) Play(twitterUserId uint64, rawCommand string) string {
 		responseText string
 	)
 
-	currentScene = game.storageEngine.GetCurrentSceneForUser(twitterUserId)
+	currentScene = game.GetCurrentSceneForUser(twitterUserId)
 	if currentScene == nil {
 		// kick off the adventure
 		nextScene = game.openingScene
@@ -60,13 +61,44 @@ func (game *Game) Play(twitterUserId uint64, rawCommand string) string {
 	}
 
 	if nextScene != nil {
-		game.storageEngine.SetCurrentSceneForUser(twitterUserId, nextScene)
+		game.SetCurrentSceneForUser(twitterUserId, nextScene)
 		responseText = nextScene.Description
 	} else {
 		responseText = "Sorry Dave, I can't let you do that"
 	}
 
 	return responseText
+}
+
+func (game *Game) SetCurrentSceneForUser(twitterUserId uint64, scene *Scene) {
+	game.storageEngine.SetCurrentSceneIdForUser(twitterUserId, scene.id)
+}
+
+func (game *Game) GetCurrentSceneForUser(twitterUserId uint64) *Scene {
+	sceneId := game.storageEngine.GetCurrentSceneIdForUser(twitterUserId)
+
+	// I have a sneaking suspicion that this recursive tree walk
+	// is not exactly *idiomatic* go
+	visitedChoices := map[*Choice]bool{}
+	var walker func(*Scene) *Scene
+	walker = func(rootScene *Scene) (desiredScene *Scene) {
+		if rootScene.id == sceneId {
+			desiredScene = rootScene
+		} else {
+			for _, choice := range rootScene.choices {
+				if !visitedChoices[choice] {
+					visitedChoices[choice] = true
+					desiredScene = walker(choice.scene)
+					if desiredScene != nil {
+						break
+					}
+				}
+			}
+		}
+		return
+	}
+
+	return walker(game.openingScene)
 }
 
 func (scene *Scene) LinkSceneViaCommand(nextScene *Scene, command Command) {
