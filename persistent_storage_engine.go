@@ -31,19 +31,17 @@ func NewPersistentStorageEngine() StorageEngine {
 	return storageEngine
 }
 
-func (repo *PersistentStorageEngine) GetCurrentSceneIdForUser(twitterUserId uint64) (int, error) {
+func (repo *PersistentStorageEngine) GetCurrentSceneKeyForUser(twitterUserId uint64) (string, error) {
 	rawValue, err := repo.gameStateStore.Read(repo.translateKey(twitterUserId))
 	if err != nil {
 		log.Printf("Read \"%v\" as rawValue with \"%v\" as err\n", rawValue, err)
-		return -1, err
+		return "", err
 	}
-	value, err := strconv.Atoi(string(rawValue))
-	return value, err
+	return string(rawValue), err
 }
 
-func (repo *PersistentStorageEngine) SetCurrentSceneIdForUser(twitterUserId uint64, sceneId int) {
-	value := strconv.Itoa(sceneId)
-	repo.gameStateStore.Write(repo.translateKey(twitterUserId), []byte(value))
+func (repo *PersistentStorageEngine) SetCurrentSceneKeyForUser(twitterUserId uint64, sceneKey string) {
+	repo.gameStateStore.Write(repo.translateKey(twitterUserId), []byte(sceneKey))
 }
 
 func (repo *PersistentStorageEngine) TweetAlreadyHandled(tweetId uint64) bool {

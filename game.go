@@ -1,8 +1,10 @@
 package goadventure
 
 import (
+	"bufio"
 	"errors"
 	"log"
+	"os"
 	"strings"
 )
 
@@ -12,7 +14,7 @@ type Game struct {
 }
 
 type Scene struct {
-	id          int
+	key         string
 	Description string
 	choices     []*Choice
 }
@@ -28,20 +30,104 @@ type Choice struct {
 }
 
 func CreateGame(storageEngine StorageEngine) *Game {
-	roomOne := &Scene{1, "Welcome to room one. You can go north.", nil}
-	roomTwo := &Scene{2, "You're in room two. You can go south or west", nil}
-	roomThree := &Scene{3, "You're in room three. You can go east", nil}
 
-	roomOne.LinkSceneViaCommand(roomTwo, Command{"go", "north"})
+	lines := make(chan string)
+	scenes := make(map[string]*Scene)
 
-	roomTwo.LinkSceneViaCommand(roomOne, Command{"go", "south"})
-	roomTwo.LinkSceneViaCommand(roomThree, Command{"go", "west"})
+	go parseLinesIntoSceneTree(scenes, lines)
 
-	roomThree.LinkSceneViaCommand(roomTwo, Command{"go", "east"})
+	readLinesFromScript("script", lines)
 
 	return &Game{
 		storageEngine,
-		roomOne,
+		scenes["start"],
+	}
+}
+
+func readLinesFromScript(scriptPath string, lines chan string) {
+	file, err := os.Open(scriptPath)
+	if err != nil {
+		log.Fatal("Error opening script file.")
+	}
+	lineReader := bufio.NewReaderSize(file, 20)
+	for line, isPrefix, e := lineReader.ReadLine(); e == nil; line, isPrefix, e = lineReader.ReadLine() {
+		fullLine := string(line)
+		if isPrefix {
+			for {
+				line, isPrefix, _ = lineReader.ReadLine()
+				fullLine += string(line)
+				if !isPrefix {
+					break
+				}
+			}
+		}
+		// add a line to the game/parse
+		lines <- fullLine
+	}
+	close(lines)
+}
+
+func parseLinesIntoSceneTree(scenes map[string]*Scene, lines chan string) {
+	/*
+		Script data format is as below.
+		First room must have key of "start"
+		All rooms must be defined before they can be referenced in a choice
+
+		===
+		key
+		description (less than 120 chars)
+		- verb noun : key (of next room)
+
+		example:
+
+		===
+		start
+		Welcome to room one. You can go north.
+		- go north : north_room
+		===
+		north_room
+		Welcome to room two. You can go south or west.
+		- go south : start
+		- go west : west_room
+		===
+		west_room
+		Welcome to room three. You can go east.
+		- go east : north_room
+	*/
+
+	maxDescriptionLength := 120
+
+	var scene *Scene
+	for line := range lines {
+		if line == "===" {
+			if scene != nil {
+				scenes[scene.key] = scene
+			}
+			scene = new(Scene)
+		} else {
+			if strings.HasPrefix("-", line) {
+				// populate choices
+				segments := strings.Split(line, ":")
+
+				sceneKey := strings.ToLower(strings.Trim(segments[1], " "))
+
+				rawCommandWords := strings.Split(strings.Trim(segments[0], " -"), " ")
+				command := Command{rawCommandWords[0], rawCommandWords[1]}
+
+				scene.LinkSceneViaCommand(scenes[sceneKey], command)
+			} else {
+				// key has not been set ("" is string zero value)
+				if scene.key == "" {
+					scene.key = strings.ToLower(line)
+				} else {
+					scene.Description = line
+					length := len(line)
+					if length > maxDescriptionLength {
+						log.Fatalf("Scene \"%v\" description exceeds max length %v with %v chars", scene.key, maxDescriptionLength, length)
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -71,12 +157,12 @@ func (game *Game) Play(twitterUserId uint64, rawCommand string) string {
 }
 
 func (game *Game) SetCurrentSceneForUser(twitterUserId uint64, scene *Scene) {
-	game.storageEngine.SetCurrentSceneIdForUser(twitterUserId, scene.id)
+	game.storageEngine.SetCurrentSceneKeyForUser(twitterUserId, scene.key)
 }
 
 func (game *Game) GetCurrentSceneForUser(twitterUserId uint64) *Scene {
-	sceneId, _ := game.storageEngine.GetCurrentSceneIdForUser(twitterUserId)
-	if sceneId == -1 {
+	sceneKey, _ := game.storageEngine.GetCurrentSceneKeyForUser(twitterUserId)
+	if sceneKey == "" {
 		return nil
 	}
 
@@ -85,7 +171,7 @@ func (game *Game) GetCurrentSceneForUser(twitterUserId uint64) *Scene {
 	visitedChoices := map[*Choice]bool{}
 	var walker func(*Scene) *Scene
 	walker = func(rootScene *Scene) (desiredScene *Scene) {
-		if rootScene.id == sceneId {
+		if rootScene.key == sceneKey {
 			desiredScene = rootScene
 		} else {
 			for _, choice := range rootScene.choices {

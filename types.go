@@ -14,6 +14,6 @@ type TwitterWrapper interface {
 type StorageEngine interface {
 	TweetAlreadyHandled(uint64) bool
 	StoreTweetHandled(uint64, string)
-	SetCurrentSceneIdForUser(uint64, int)
-	GetCurrentSceneIdForUser(uint64) (int, error)
+	SetCurrentSceneKeyForUser(uint64, string)
+	GetCurrentSceneKeyForUser(uint64) (string, error)
 }

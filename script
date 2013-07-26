@@ -1,0 +1,13 @@
+===
+start
+Welcome to room one. You can go north.
+- go north : north_room
+===
+north_room
+Welcome to room two. You can go south or west.
+- go south : start
+- go west : west_room
+===
+west_room
+Welcome to room three. You can go east.
+- go east : north_room

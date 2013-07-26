@@ -27,6 +27,7 @@ func main() {
 		signal.Notify(signalChannel, syscall.SIGINT)
 
 		<-signalChannel
+
 		log.Println("\n\nSIGINT Received, Shutting Down")
 		stopRunning <- true
 		close(stopRunning)
