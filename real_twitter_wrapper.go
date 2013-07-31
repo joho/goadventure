@@ -2,12 +2,13 @@ package goadventure
 
 import (
 	"fmt"
+	"github.com/joho/godotenv"
 	"github.com/kurrik/oauth1a"
 	"github.com/kurrik/twittergo"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 	"time"
 )
@@ -129,15 +130,21 @@ func printResponseRateLimits(resp *twittergo.APIResponse) {
 }
 
 func loadCredentials() *twittergo.Client {
-	credentials, err := ioutil.ReadFile("CREDENTIALS")
+	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("CREDENTIALS file missing")
+		log.Fatal(".env file missing")
 	}
-	lines := strings.Split(string(credentials), "\n")
+
+	consumerKey := os.Getenv("TWITTER_CONSUMER_KEY")
+	consumerSecret := os.Getenv("TWITTER_CONSUMER_SECRET")
 	config := &oauth1a.ClientConfig{
-		ConsumerKey:    lines[0],
-		ConsumerSecret: lines[1],
+		ConsumerKey:    consumerKey,
+		ConsumerSecret: consumerSecret,
 	}
-	user := oauth1a.NewAuthorizedConfig(lines[2], lines[3])
+
+	accessToken := os.Getenv("TWITTER_ACCESS_TOKEN")
+	accessTokenSecret := os.Getenv("TWITTER_ACCESS_TOKEN_SECRET")
+	user := oauth1a.NewAuthorizedConfig(accessToken, accessTokenSecret)
+
 	return twittergo.NewClient(config, user)
 }
