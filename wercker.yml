@@ -1,3 +1,4 @@
+# build steps cribbed enthusiastically from http://blog.wercker.com/2013/07/25/improving-Go-build-time-with-wercker-cache.html
 box: pjvds/golang
 build:
   steps:
