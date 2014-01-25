@@ -2,6 +2,8 @@
 
 ![I have no idea what I'm doing](http://media.tumblr.com/tumblr_me0qrvGwDP1r3z80e.jpg)
 
+[![baby-gopher](https://raw2.github.com/drnic/babygopher-site/gh-pages/images/babygopher-badge.png)](http://www.babygopher.org)
+
 ## Wat?
 
 One day this will be the finest twitter based novelty text adventure engine in all the lands.
