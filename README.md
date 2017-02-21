@@ -10,10 +10,6 @@ One day this will be the finest twitter based novelty text adventure engine in a
 
 Right now it's a git log of embarrassment as I learn a new programming language. When it's a bit further along, I'll ask for some help/feedback, but for right now just let me struggle along myself.
 
-## Build Status
-
-[![wercker status](https://app.wercker.com/status/c5ab59c3a612589b5b804fb6814e535c/m "wercker status")](https://app.wercker.com/project/bykey/c5ab59c3a612589b5b804fb6814e535c)
-
 ## Licence
 
 I haven't decided yet, for right now consider it plain old copyright.
